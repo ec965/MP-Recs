@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GradeRecs from './ticklist';
+import GradeRecs from './climbFinder';
 import User from './user';
 import apiKey from './apiKey.json';
 //create a JSON called apiKey.json in ./src/ with format:

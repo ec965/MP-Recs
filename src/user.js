@@ -1,31 +1,24 @@
 import React from 'react';
-import update from 'immutability-helper';
-import RouteListJSX from './route';
 
 //JSX child component for User
 function UserJSX (props){
   return (
     <div>
       <h1>{props.name}</h1>
-      <p>{props.memberSince}</p>
+      <p>Member since: {props.memberSince}</p>
     </div>
   );
 }
 
 //parent component
 //stores all the user's information
-export default class UserData extends React.Component{
+export default class User extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
       error: null,
       name: null,
       memberSince: null,
-      tickList: this.props.tickList,
-      toDoList:[],
-      flashGrade: null,
-      sendGrade:null,
-      projectGrade:null
     };
   }
 
@@ -57,7 +50,6 @@ export default class UserData extends React.Component{
     return (
       <div>
         <UserJSX name={this.state.name} memberSince={this.state.memberSince}/>
-        <RouteListJSX routes={this.state.tickList}/>
       </div>
     );
   }

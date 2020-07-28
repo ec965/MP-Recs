@@ -1,39 +1,40 @@
 import React from 'react';
-//create a JSON called apiKey.json in ./src/ with format:
-/*
-{
-  "email":"email@email.com",
-  "key":"your_mp_apikey"
-}
-*/
-import apiKey from './apiKey.json';
+import update from 'immutability-helper';
+import RouteListJSX from './route';
 
 //JSX child component for User
-class UserJSX extends React.Component{
-  render(){
-    return (
-      <div>
-        <h1>{this.props.name}</h1>
-        <p>{this.props.memberSince}</p>
-      </div>
-    );
-  }
+function UserJSX (props){
+  return (
+    <div>
+      <h1>{props.name}</h1>
+      <p>{props.memberSince}</p>
+    </div>
+  );
 }
 
 //parent component
 //stores all the user's information
-export default class User extends React.Component{
+export default class UserData extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
       error: null,
       name: null,
-      memberSince: null
+      memberSince: null,
+      tickList: this.props.tickList,
+      toDoList:[],
+      flashGrade: null,
+      sendGrade:null,
+      projectGrade:null
     };
   }
 
   componentDidMount() {
-    fetch('https://www.mountainproject.com/data/get-user?email='+ apiKey.email +'&key=' + apiKey.key)
+    this.getName();
+  }
+
+  getName(){
+    fetch('https://www.mountainproject.com/data/get-user?email='+ this.props.email +'&key=' + this.props.apiKey)
       .then(response => response.json())
       .then(
         (data) => {
@@ -53,6 +54,11 @@ export default class User extends React.Component{
   }
 
   render(){
-    return <UserJSX name={this.state.name} memberSince={this.state.memberSince}/>;
+    return (
+      <div>
+        <UserJSX name={this.state.name} memberSince={this.state.memberSince}/>
+        <RouteListJSX routes={this.state.tickList}/>
+      </div>
+    );
   }
 }

@@ -1,29 +1,41 @@
 import React from 'react';
-import apiKey from './apiKey.json';
-//create a JSON called apiKey.json in ./src/ with format:
-/*
-{
-  "email":"email@email.com",
-  "key":"your_mp_apikey"
-}
-*/
 
-//JSX child component for Rotue
-class RouteJSX extends React.Component{
-  render(){
-    return(
-      <div>
-        <p>{this.props.name} {this.props.rating}</p>
-      </div>
+//individual route JSX component
+function RouteJSX(props){
+  return(
+    <p>{props.name} {props.rating} {props.type}</p>
+  );
+}
+
+//JSX component to create a list of route html elements from a rotue array 
+export function RouteListJSX(props) {
+  var routesForJSX = [];
+  var r;
+  var i=0;
+  for(r of props.routes){
+    routesForJSX.push(
+      <li key={i}>
+        <RouteJSX name={r.name} rating={r.rating} type={r.type}/>
+      </li>
     );
+
+    i++;
   }
+  return(
+      <div>
+        <ul>
+          {routesForJSX}
+        </ul>
+      </div>
+  );
 }
 
-//<Route id={#######,#######,#######}/> with as many id up to 200
+//get route information
 export default class Routes extends React.Component{
     constructor(props) {
       super(props);
-
+      console.log("props.route ids");
+      console.log(this.props.routeIds);
       //keep track of errors
       this.state = {
         error: null,
@@ -32,7 +44,11 @@ export default class Routes extends React.Component{
     }
 
     componentDidMount() {
-      fetch('https://www.mountainproject.com/data/get-routes?routeIds=' + this.props.ids + '&key=' + apiKey.key)
+      var fetchString = 'https://www.mountainproject.com/data/get-routes?routeIds=' + this.props.routeIds + '&key=' + this.props.apiKey;
+      console.log("fetch route info string");
+      console.log(fetchString);
+
+      fetch('https://www.mountainproject.com/data/get-routes?routeIds=' + this.props.routeIds + '&key=' + this.props.apiKey)
         .then(response => response.json())
         .then(
           (data) => {
@@ -52,6 +68,9 @@ export default class Routes extends React.Component{
               this.setState({
                 routes: [...this.state.routes, routeObject]
               });
+
+              console.log("routes object array");
+              console.log(this.state.routes);
             }
           },
           (error) => {
@@ -64,20 +83,12 @@ export default class Routes extends React.Component{
     }
 
     render(){
+      console.log("routes object array");
       console.log(this.state.routes);
-      var routesForJSX = [];
-      var r;
-
-      //put all the JSX components into an array for "printing"
-      for(r of this.state.routes){
-        console.log(r);
-        routesForJSX.push(<RouteJSX name={r.name} rating={r.rating}/>);
-      }
-
-
+    
       return (
         <div>
-          {routesForJSX}
+          <RouteListJSX routes={this.state.routes}/>
         </div>
       );
     }

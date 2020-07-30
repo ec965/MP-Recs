@@ -1,7 +1,7 @@
 import React from 'react';
 
 //JSX child component for User
-function UserJSX (props){
+export function UserJSX (props){
   return (
     <div>
       <h1>{props.name}</h1>

@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import GradeRecs from './climbFinder';
-import User from './user';
+import UserForm from './form'; 
+import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
+
 import apiKey from './apiKey.json';
 //create a JSON called apiKey.json in ./src/ with format:
 /*
@@ -15,13 +18,14 @@ import apiKey from './apiKey.json';
 class App extends React.Component{
   render(){
     return(
-      <div>
-        <User email={apiKey.email} apiKey={apiKey.key}/>
-        <GradeRecs apiKey={apiKey.key} email={apiKey.email} lat={37.75} lon={-122.39} distance={100}/>
-      </div>
+      <React.Fragment>
+        <CssBaseline/>
+          <Container>
+            <UserForm/>
+          </Container>
+      </React.Fragment>
     );
   }
 }
 
-//  <Routes apiKey={apiKey.key} routeIds={'109099185,105750454'}/>
 ReactDOM.render(<App/>, document.getElementById('root'));

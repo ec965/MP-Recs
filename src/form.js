@@ -1,16 +1,19 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import RouteCardDeck from './routeCard'; 
 import RouteTable from './dataTable'; 
-
+import UserInformation from './userinfo';
+import Paper from '@material-ui/core/Paper';
+import Container from '@material-ui/core/Container';
 //CSS dependencies
 import { withStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 
 import apiKey from './apiKey.json';
+
+
 
 const styles = theme => ({
   root: {
@@ -23,17 +26,6 @@ const styles = theme => ({
 });
 
 
-function UserInformation(props){
-  let memberDate = new Date(props.memberSince);
-
-  return(
-    <div>
-      <Typography variant="h5">{props.name}</Typography>
-      <Typography variant="subtitle2">Member since: {memberDate.toDateString().substring(3)}</Typography>
-      <Typography variant="subtitle1">Rating Recommendation: V{props.flashGrade} - V{props.projectGrade}</Typography>
-    </div>
-  );
-}
 
 
 
@@ -49,7 +41,7 @@ class UserForm extends React.Component{
       lat: apiKey.lat,
       lon: apiKey.lon,
       distance: apiKey.distance,
-      maxResults: 50,
+      maxResults: 10,
 
 //things to fetch
       name: null,
@@ -277,162 +269,131 @@ class UserForm extends React.Component{
 
 
   render(){
-    console.log(this.state.email);
-    console.log(this.state.apiKey);
-    
-    console.log(this.state.lat);
-    console.log(this.state.lon);
-    console.log(this.state.distance);
-    
-    console.log(this.state.name);
-    console.log(this.state.memberSince);
-    
-    // console.log(this.state.recList);
-    console.log(this.state.recList[0]);
-    console.log(this.state.flashGrade);
-    console.log(this.state.projectGrade);
-    
+    console.log(this.state.recList);
     console.log(this.state.error);
     
     const { classes } = this.props;
 
     return(
-      <div className={classes.root}>
-        <form autoComplete="on" onSubmit={this.handleFormSubmit}>
-          <Grid container 
-            direction="row" 
-            justify="flex-start" 
-            alignItems="flex-start" 
-            spacing={1}
-          >
-            <Grid item>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
+      <div>
+        <Paper>
+          <form autoComplete="on" onSubmit={this.handleFormSubmit}>
+            <Grid container 
+              direction="row" 
+              justify="flex-start" 
+              alignItems="flex-start" 
+              spacing={1}
+            >
+              <Grid item>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="email"
+                  label="Email"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="apiKey"
+                  label="API Key"
+                  name="apiKey"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
             </Grid>
-            <Grid item>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="apiKey"
-                label="API Key"
-                name="apiKey"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
+            <Grid container 
+              direction="row" 
+              justify="flex-start" 
+              alignItems="flex-start" 
+              spacing={1}
+            >
+              <Grid item lg={1}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="lat"
+                  label="Latitude"
+                  name="lat"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
+              <Grid item lg={1}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="lon"
+                  label="Longitude"
+                  name="lon"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="distance"
+                  label="Distance"
+                  name="distance"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  id="maxResults"
+                  label="Results To Find"
+                  name="maxResults"
+                  autoFocus
+                  onChange={this.handleInputChange}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid container 
-            direction="row" 
-            justify="flex-start" 
-            alignItems="flex-start" 
-            spacing={1}
-          >
-            <Grid item lg={1}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="lat"
-                label="Latitude"
-                name="lat"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
-            </Grid>
-            <Grid item lg={1}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="lon"
-                label="Longitude"
-                name="lon"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="distance"
-                label="Distance"
-                name="distance"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                id="maxResults"
-                label="Results To Find"
-                name="maxResults"
-                autoFocus
-                onChange={this.handleInputChange}
-              />
-            </Grid>
-          </Grid>
 
-          <Grid container 
-            direction="row" 
-            justify="flex-start" 
-            alignItems="flex-start" 
-            spacing={1}
-          >
-            <Grid item xs={12}>
-              <Button
-                className={classes.button}
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Submit
-              </Button>
+            <Grid container 
+              direction="row" 
+              justify="flex-start" 
+              alignItems="flex-start" 
+              spacing={1}
+            >
+              <Grid item xs={12}>
+                <Button
+                  className={classes.button}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                >
+                  Submit
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-        
+          </form>
+        </Paper>
 
-        <Grid container 
-          direction="row" 
-          justify="flex-start" 
-          alignItems="flex-start" 
-          spacing={1}
-        >
-          {this.state.showResults && 
-            <UserInformation 
-              name={this.state.name} 
-              memberSince={this.state.memberSince}
-              projectGrade={this.state.projectGrade}
-              flashGrade={this.state.flashGrade}
-            />
-          }
-        </Grid>
+        {this.state.showResults && 
+          <UserInformation 
+            name={this.state.name} 
+            memberSince={this.state.memberSince}
+            projectGrade={this.state.projectGrade}
+            flashGrade={this.state.flashGrade}
+          />
+        }
 
-        <Grid container 
-          direction="row" 
-          justify="flex-start" 
-          alignItems="flex-start" 
-          spacing={1}
-        >
-          {this.state.showResults && <RouteCardDeck routeList={this.state.recList} />} 
-        </Grid>
-        <Grid container 
-          direction="row" 
-          justify="flex-start" 
-          alignItems="flex-start" 
-          spacing={1}
-        >
-          {this.state.showResults && <RouteTable recList={this.state.recList} />}
-        </Grid>
+        {this.state.showResults && 
+          <RouteTable 
+            recList={this.state.recList} 
+          />
+        }
       </div>
     );
   }

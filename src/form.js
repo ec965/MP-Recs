@@ -3,7 +3,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-
+import RouteCardDeck from './routeCard'; 
 import RouteTable from './dataTable'; 
 
 //CSS dependencies
@@ -23,11 +23,14 @@ const styles = theme => ({
 });
 
 
-function NameMemberSince(props){
+function UserInformation(props){
+  let memberDate = new Date(props.memberSince);
+
   return(
     <div>
       <Typography variant="h5">{props.name}</Typography>
-      <Typography variant="h6">{props.memberSince}</Typography>
+      <Typography variant="subtitle2">Member since: {memberDate.toDateString().substring(3)}</Typography>
+      <Typography variant="subtitle1">Rating Recommendation: V{props.flashGrade} - V{props.projectGrade}</Typography>
     </div>
   );
 }
@@ -46,6 +49,7 @@ class UserForm extends React.Component{
       lat: apiKey.lat,
       lon: apiKey.lon,
       distance: apiKey.distance,
+      maxResults: 50,
 
 //things to fetch
       name: null,
@@ -59,7 +63,7 @@ class UserForm extends React.Component{
       error: null,
 
       //show table bool
-      showTable:false,
+      showResults:false,
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -71,7 +75,7 @@ class UserForm extends React.Component{
     event.preventDefault();
     this.getName();
     this.getClimbs();
-    this.setState({showTable:true});
+    this.setState({showResults:true});
   }
 
   handleInputChange(event) {
@@ -170,8 +174,9 @@ class UserForm extends React.Component{
                       fetchString = "https://www.mountainproject.com/data/get-routes-for-lat-lon?"
                       fetchString += "lat=" + this.state.lat + "&lon=" + this.state.lon;
                       fetchString += "&maxDistance=" + this.state.distance;
-                      fetchString += "&maxResults=200"; //perhaps give an option to return more boulders later
-                      fetchString += "&minDiff=V" + (this.state.flashGrade) + "&maxDiff=V" + (this.state.projectGrade);
+                      fetchString += "&maxResults=" + this.state.maxResults; //perhaps give an option to return more boulders later
+                      fetchString += "&minDiff=V" + (this.state.flashGrade);
+                      fetchString += "&maxDiff=V" + (this.state.projectGrade);
                       fetchString += "&key=" + this.state.apiKey;
                       
                       console.log("getting routes from lat lon");
@@ -217,7 +222,7 @@ class UserForm extends React.Component{
                                         }
                                       }
                                       
-                                        
+
                                       //this is the final array we need!
                                       this.setState({recList:todoRouteList});
                                       console.log(this.state.recList);
@@ -282,7 +287,8 @@ class UserForm extends React.Component{
     console.log(this.state.name);
     console.log(this.state.memberSince);
     
-    console.log(this.state.recList);
+    // console.log(this.state.recList);
+    console.log(this.state.recList[0]);
     console.log(this.state.flashGrade);
     console.log(this.state.projectGrade);
     
@@ -329,7 +335,7 @@ class UserForm extends React.Component{
             alignItems="flex-start" 
             spacing={1}
           >
-            <Grid item>
+            <Grid item lg={1}>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -340,7 +346,7 @@ class UserForm extends React.Component{
                 onChange={this.handleInputChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item lg={1}>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -358,6 +364,17 @@ class UserForm extends React.Component{
                 id="distance"
                 label="Distance"
                 name="distance"
+                autoFocus
+                onChange={this.handleInputChange}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                id="maxResults"
+                label="Results To Find"
+                name="maxResults"
                 autoFocus
                 onChange={this.handleInputChange}
               />
@@ -390,7 +407,14 @@ class UserForm extends React.Component{
           alignItems="flex-start" 
           spacing={1}
         >
-          <NameMemberSince name={this.state.name} memberSince={this.state.memberSince} />
+          {this.state.showResults && 
+            <UserInformation 
+              name={this.state.name} 
+              memberSince={this.state.memberSince}
+              projectGrade={this.state.projectGrade}
+              flashGrade={this.state.flashGrade}
+            />
+          }
         </Grid>
 
         <Grid container 
@@ -399,7 +423,15 @@ class UserForm extends React.Component{
           alignItems="flex-start" 
           spacing={1}
         >
-          {this.state.showTable && <RouteTable recList={this.state.recList} />}
+          {this.state.showResults && <RouteCardDeck routeList={this.state.recList} />} 
+        </Grid>
+        <Grid container 
+          direction="row" 
+          justify="flex-start" 
+          alignItems="flex-start" 
+          spacing={1}
+        >
+          {this.state.showResults && <RouteTable recList={this.state.recList} />}
         </Grid>
       </div>
     );

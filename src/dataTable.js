@@ -7,45 +7,77 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 
+
+function RouteTableHeader (props){
+  return(
+    <Typography variant="h6">{props.locationTitle}</Typography>
+  );
+}
+
+function RouteTableCell (props){
+  return(
+    <React.Fragment>
+      <TableRow hover key={props.route.id}>
+        <TableCell component="th" scope="row">
+          <Link href={props.route.url}>{props.route.name}</Link>
+        </TableCell>
+        <TableCell>{props.route.rating}</TableCell>
+        <TableCell>{props.route.stars}</TableCell>
+        <TableCell>{props.route.starVotes}</TableCell>
+        <TableCell>
+          {props.route.toDo
+            ? <CheckIcon/>
+            : <ClearIcon/>                   
+          }
+        </TableCell>
+        <TableCell>
+          <img src={props.route.imgSqSmall} alt="Unavailable"></img>
+        </TableCell>
+        <TableCell>
+          <List dense={true}>
+          {props.route.location.map((loc,index) => (
+            <ListItem button key={index}>
+              <ListItemText primary={loc}/>
+            </ListItem>
+          ))}
+          </List>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
 
 export default function RouteTable(props){
   return(
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Rating</TableCell>
-            <TableCell>Stars</TableCell>
-            <TableCell>Star Votes</TableCell>
-            <TableCell>To Do</TableCell>
-            <TableCell>Image</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.recList.map((route) => (
-            <TableRow key={route.id}>
-              <TableCell component="th" scope="row">
-                <a href={route.url}>{route.name}</a>
-              </TableCell>
-              <TableCell>{route.rating}</TableCell>
-              <TableCell>{route.stars}</TableCell>
-              <TableCell>{route.starVotes}</TableCell>
-              <TableCell>
-                {route.toDo
-                  ? <CheckIcon/>
-                  : <ClearIcon/>                   
-                }
-              </TableCell>
-              <TableCell>
-                <img src={route.imgSqSmall} alt={route.name + " image unavailable"}></img>
-              </TableCell>
+    <React.Fragment>
+      <RouteTableHeader locationTitle={"Recommended Routes"}/>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Rating</TableCell>
+              <TableCell>Stars</TableCell>
+              <TableCell>Star Votes</TableCell>
+              <TableCell>To Do</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Location</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {props.recList.map((route) => (
+              <RouteTableCell key={route.id} route={route}/>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </React.Fragment>
   );
 }
 

@@ -2,11 +2,11 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import RouteCardDeck from './routeCard'; 
 import RouteTable from './dataTable'; 
 import UserInformation from './userinfo';
 import Paper from '@material-ui/core/Paper';
-import Container from '@material-ui/core/Container';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 //CSS dependencies
 import { withStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
@@ -33,47 +33,75 @@ class UserForm extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-//change these values back to null, just api json for testing
-//things to get from the form
-      email: apiKey.email,
-      apiKey: apiKey.key,
+      //change these values back to null, just api json for testing
+      //things to get from the form
+      email: localStorage.getItem('email') || apiKey.email,
+      apiKey: localStorage.getItem('apiKey') || apiKey.key,
+      rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,
       
-      lat: apiKey.lat,
-      lon: apiKey.lon,
-      distance: apiKey.distance,
-      maxResults: 10,
+      lat: localStorage.getItem('lat') || apiKey.lat,
+      lon: localStorage.getItem('lon') || apiKey.lon,
+      distance: localStorage.getItem('distance') || apiKey.distance,
+      maxResults: localStorage.getItem('maxResults') || 50,
 
-//things to fetch
-      name: null,
-      memberSince: null,
+      //things to fetch
+      name: localStorage.getItem('name') || null,
+      memberSince: localStorage.getItem('memberSince') || null,
 
-      recList:[],
-      flashGrade: 0,
-      projectGrade: 0,
+      recList: JSON.parse(localStorage.getItem('recList')) || [],
+      flashGrade: localStorage.getItem('flashGrade') || 0,
+      projectGrade: localStorage.getItem('projectGrade') || 0,
 
-//fetch error var
+      //fetch error var
       error: null,
 
       //show table bool
-      showResults:false,
+      showResults: (localStorage.getItem('showResults')==='true') || false,
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    this.handleCheck = this.handleCheck.bind(this);
   }
   
   handleFormSubmit(event){
     console.log("submit button clicked");
     event.preventDefault();
+    
     this.getName();
     this.getClimbs();
     this.setState({showResults:true});
+
+    if( this.state.rememberMe ){
+      localStorage.setItem( 'email', this.state.email );
+      localStorage.setItem( 'apiKey', this.state.apiKey );
+      localStorage.setItem( 'rememberMe', this.state.rememberMe);
+      localStorage.setItem( 'lat', this.state.lat);
+      localStorage.setItem( 'lon', this.state.lon);
+      localStorage.setItem( 'distance', this.state.distance );
+      localStorage.setItem( 'maxResults', this.state.maxResults );
+      localStorage.setItem( 'showResults', this.state.showResults );
+    }
+    else{
+      localStorage.clear();
+    }
   }
 
   handleInputChange(event) {
     this.setState({
       [event.target.name] : event.target.value
     });
+  }
+  
+  handleCheck(event){
+    this.setState({
+      [event.target.name]: event.target.checked
+    });
+
+    //you'd think this should be !this.state.rememberMe but for some reason this works
+    if( this.state.rememberMe ){
+      localStorage.clear()
+    }
   }
 
   getName(){
@@ -86,6 +114,11 @@ class UserForm extends React.Component{
             name: data.name,
             memberSince: data.memberSince
           });
+
+          if( this.state.rememberMe ){
+            localStorage.setItem( 'name', this.state.name );
+            localStorage.setItem( 'memberSince', this.state.memberSince );
+          }
         },
         (error) => {
           this.setState({
@@ -218,6 +251,11 @@ class UserForm extends React.Component{
                                       //this is the final array we need!
                                       this.setState({recList:todoRouteList});
                                       console.log(this.state.recList);
+                                      if( this.state.rememberMe ){
+                                        localStorage.setItem( 'recList', JSON.stringify(this.state.recList) );
+                                        localStorage.setItem( 'flashGrade', this.state.flashGrade );
+                                        localStorage.setItem( 'projectGrade', this.state.projectGrade );
+                                      }
                                   }
                                   else{
                                     this.setState({error:true});
@@ -305,6 +343,20 @@ class UserForm extends React.Component{
                   name="apiKey"
                   autoFocus
                   onChange={this.handleInputChange}
+                />
+              </Grid>
+              <Grid item>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="rememberMe"
+                      name="rememberMe"
+                      checked={this.state.rememberMe}
+                      onChange={this.handleCheck}
+                      color="primary"
+                    />
+                  }
+                  label="Remeber Me"
                 />
               </Grid>
             </Grid>

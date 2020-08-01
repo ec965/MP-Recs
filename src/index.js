@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import UserForm from './form'; 
+import UserForm from './app'; 
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -20,9 +20,7 @@ class App extends React.Component{
     return(
       <React.Fragment>
         <CssBaseline/>
-          <Container>
-            <UserForm/>
-          </Container>
+          <UserForm/>
       </React.Fragment>
     );
   }

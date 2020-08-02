@@ -197,25 +197,9 @@ function RouteTableCell (props){
 
 
 export default function RouteTable(props){
-  const { align, recList } = props;
+  const { align, recList, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = props;
   const classes=useStyles();
 
-  //starting page
-  const [page, setPage] = React.useState(0);
-  //starting amount of rows per page
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  
-  //const emptyRows = rowsPerPage - Math.min(rowsPerPage, recList.length - page * rowsPerPage);
-
-  function handleChangePage(e, newPage){
-    window.scrollTo(0,0);
-    setPage(newPage);
-  }
-
-  function handleChangeRowsPerPage(e){
-    setRowsPerPage( parseInt(e.target.value, 10));
-    setPage(0);
-  }
   
   const headerRow = ['Name', 'Rating', 'Stars / Votes', 'To Do', 'Image', 'Location', 'Beta'];
 
@@ -225,8 +209,8 @@ export default function RouteTable(props){
         <Table size="small" padding="none">
           <TableHead>
             <TableRow>
-              {headerRow.map((heading) => (
-                <TableCell className={classes.tableCellHeading} align={align}>{heading}</TableCell>
+              {headerRow.map((heading, index) => (
+                <TableCell key={index} className={classes.tableCellHeading} align={align}>{heading}</TableCell>
               ))}
             </TableRow>
           </TableHead>

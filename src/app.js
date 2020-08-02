@@ -7,6 +7,7 @@ import UserInformation from './userinfo';
 import RouteTable from './dataTable'; 
 import IconTabs from './tabs'; 
 import FormFieldOutline from './form'; 
+import LoadingSpinner from './loading'; 
 //CSS dependencies
 
 import apiKey from './apiKey.json';
@@ -49,17 +50,38 @@ export default class UserForm extends React.PureComponent{
       //things to fetch
       name: localStorage.getItem('name') || null,
       memberSince: localStorage.getItem('memberSince') || null,
+      userUrl: localStorage.getItem('userUrl') || null,
 
       recList: JSON.parse(localStorage.getItem('recList')) || [],
       flashGrade: localStorage.getItem('flashGrade') || 0,
       projectGrade: localStorage.getItem('projectGrade') || 0,
 
-      //fetch error var
-      error: null,
+      //fetch error vars
+      fetchError: {
+        getUser: null,
+        getTicks: null,
+        getRoutes: null,
+        getRoutesForLatLon: null,
+        getToDos: null
+      },
+
+      apiError: {
+        getUser: null,
+        getTicks: null,
+        getRoutes: null,
+        getRoutesForLatLon: null,
+        getToDos:null
+      },
       
       currentTab: 0,  //change this back to zero before release
-      
-      //show table bool
+
+      //Results (dataTable.js) state controllers
+      currentPage: 0,
+      rowsPerPage: 5,
+
+      //control loading spinner (loading.js)
+      loading: false,
+      //boolean to enable the results tab
       haveResults: (localStorage.getItem('haveResults')==='true') || false,
     }
 
@@ -67,16 +89,37 @@ export default class UserForm extends React.PureComponent{
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleChangeTab = this.handleChangeTab.bind(this);
+    this.handleChangePage = this.handleChangePage.bind(this);
+    this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
   }
- 
+
+  //Tab state controller (tabs.js)
   handleChangeTab(event, newValue){
     this.setState({ currentTab : newValue });
   };
 
+  //Results (dataTable.js) state controlers
+  handleChangePage(e, newPage){
+    window.scrollTo(0,0);
+    this.setState({currentPage: newPage});
+  }
+  
+  handleChangeRowsPerPage(e){
+    this.setState({ 
+      rowsPerPage : parseInt(e.target.value, 10),
+      currentPage: 0, 
+    });
+  }
+
+  /////------------------------------------------------
+  //Form (form.js) sate controllers
   handleFormSubmit(event){
     console.log("submit button clicked");
     event.preventDefault();
-
+    
+    this.setState({
+      loading:true
+    });
 
     //if recList or name are missing from local storage, then make the APi calls
     //this is only for testing and should be removed later
@@ -84,6 +127,15 @@ export default class UserForm extends React.PureComponent{
     if( (localStorage.getItem('recList')===null) || (localStorage.getItem('name')===null) ){
       this.getName();
       this.getClimbs();
+    }
+    else{
+      //after after all data is loaded, go to the new tab
+      //enable tab1 navigation after data is retrieved
+      this.setState({ 
+        currentTab : 1,
+        haveResults: true,
+        loading: false,
+      });
     }
 
     //if rememberMe then store everything into local storage
@@ -96,16 +148,12 @@ export default class UserForm extends React.PureComponent{
       localStorage.setItem( 'lon', this.state.lon);
       localStorage.setItem( 'distance', this.state.distance );
       localStorage.setItem( 'maxResults', this.state.maxResults );
-      localStorage.setItem( 'haveResults', true );
+      localStorage.setItem( 'haveResults', this.state.haveResults );
     }
     else{
       localStorage.clear();
     }
     
-    //after after all data is loaded, go to the new tab
-    this.setState({ currentTab : 1});
-    //enable tab1 navigation 
-    this.setState({haveResults:true});
   }
   
   handleInputChange(event) {
@@ -124,30 +172,43 @@ export default class UserForm extends React.PureComponent{
       localStorage.clear()
     }
   }
-  
-  
+  ////-------------------------------------------------------- 
+  //API call/ functions
   getName(){
     fetch('https://www.mountainproject.com/data/get-user?email='+ this.state.email +'&key=' + this.state.apiKey)
       .then(response => response.json())
       .then(
         (data) => {
-          //console.log(data);
-          this.setState({
-            name: data.name,
-            memberSince: data.memberSince
-          });
+          if(data.success === 1){
+            //console.log(data);
+            this.setState({
+              name: data.name,
+              memberSince: data.memberSince,
+              userUrl: data.url, 
+            });
 
-          if( this.state.rememberMe ){
-            localStorage.setItem( 'name', this.state.name );
-            localStorage.setItem( 'memberSince', this.state.memberSince );
+            if( this.state.rememberMe ){
+              localStorage.setItem( 'name', this.state.name );
+              localStorage.setItem( 'memberSince', this.state.memberSince );
+              localStorage.setItem( 'userUrl', this.state.userUrl );
+            }
+            else{
+              localStorage.clear();
+            }
           }
           else{
-            localStorage.clear();
+            this.setState({
+              apiError:{
+                getUser:true
+              }
+            });
           }
         },
         (error) => {
           this.setState({
-            error
+            fetchError: {
+              getUser: true
+            }
           });
         }
       )
@@ -284,50 +345,96 @@ export default class UserForm extends React.PureComponent{
                                       else{
                                         localStorage.clear();
                                       }
+
+
+////---------------------------------->
+                                      //after after all data is loaded, go to the new tab
+                                      //enable tab1 navigation after data is retrieved
+                                      this.setState({ 
+                                        currentTab : 1,
+                                        haveResults: true,
+                                        loading: false,
+                                      });
                                   }
                                   else{
-                                    this.setState({error:true});
-                                    console.log("error getting the todo list");
+                                    this.setState({
+                                      apiError:{
+                                        getToDos:true
+                                      }
+                                    });
+                                    console.error(this.state.apiError);
                                   }
                                 },
                                 (error)=> {
-                                  this.setState({error:true});
+                                  this.setState({
+                                    fetchError:{
+                                      getToDos:true
+                                    }
+                                  });
+                                  console.error(this.state.fetchError);
                                 }
                               )
                               .catch(console.error);
 
                             }
                             else{
-                              this.setState({error:true});
-                              console.log("error getting lat/lon route recomendations");
+                              this.setState({
+                                apiError:{
+                                  getRoutesForLatLon:true
+                                }
+                              });
+                              console.error(this.state.apiError);
                             }
                           },
                           (error)=> {
-                            this.setState({error:true});
+                            this.setState({
+                              fetchError:{
+                                getRoutesForLatLon:true
+                              }
+                            });
+                            console.error(this.state.fetchError);
                           }
                         )
                         .catch(console.error);
                     }
                     
                     else {
-                      this.setState({error:true});
-                      console.log("error getting route data from ticks");
+                      this.setState({
+                        apiError:{
+                          getRoutes: true
+                        }
+                      });
+                      console.error(this.state.apiError);
                     }
                   },
                   (error)=> {
-                    this.setState({error:true});
+                    this.setState({
+                      fetchError:{
+                        getRoutes:true
+                      }
+                    });
+                    console.error(this.state.fetchError);
                   }
                 )
                 .catch(console.error);
             }
             
             else{
-              this.setState({error:true});
-              console.log("error getting tick list");
+              this.setState({
+                apiError:{
+                  getTicks: true
+                }
+              });
+              console.error(this.state.apiError);
             }    
         },
         (error) => {
-          this.setState({error});
+          this.setState({
+            fetchError:{
+              getTicks:true
+            }
+          });
+          console.error(this.state.fetchError);
         }
       )
       .catch(console.error);
@@ -335,7 +442,6 @@ export default class UserForm extends React.PureComponent{
 
 
   render(){
-
     return(
       <div>
         <IconTabs
@@ -365,6 +471,9 @@ export default class UserForm extends React.PureComponent{
                   maxResults={this.state.maxResults}
                 />
               </Grid>
+              <Grid item>
+                <LoadingSpinner load={this.state.loading}/>
+              </Grid>
             </Grid>
           }
           
@@ -384,6 +493,7 @@ export default class UserForm extends React.PureComponent{
                   <UserInformation 
                     name={this.state.name} 
                     memberSince={this.state.memberSince}
+                    userUrl={this.state.userUrl}
                     projectGrade={this.state.projectGrade}
                     flashGrade={this.state.flashGrade}
                   />
@@ -391,7 +501,11 @@ export default class UserForm extends React.PureComponent{
                 <Grid item>
                   <RouteTable
                     align="justify"
-                    recList={this.state.recList} 
+                    recList={this.state.recList}
+                    page={this.state.currentPage}
+                    handleChangePage={this.handleChangePage}
+                    rowsPerPage={this.state.rowsPerPage}
+                    handleChangeRowsPerPage={this.handleChangeRowsPerPage}
                   />
                 </Grid>
               </Grid>

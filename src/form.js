@@ -19,6 +19,10 @@ const useStyles = makeStyles({
   note:{
     marginRight : 10,
     marginBottom: 0,
+    paddingBottom:0,
+  },
+  button:{
+    marginTop:12,
   },
   rememberMe:{
     marginTop: 5,
@@ -151,6 +155,7 @@ export default function FormFieldOutline(props){
         >
           <Grid item>
             <Button
+              className={classes.button}
               type="submit"
               variant="contained"
               color="primary"

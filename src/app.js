@@ -6,7 +6,7 @@ import Container from '@material-ui/core/Container';
 import UserInformation from './userinfo';
 import RouteTable from './dataTable'; 
 import IconTabs from './tabs'; 
-import FormFieldOutline from './form'; 
+import FormikForm from './form'; 
 import LoadingSpinner from './loading'; 
 //CSS dependencies
 
@@ -34,23 +34,20 @@ export default class UserForm extends React.PureComponent{
   constructor(props){
     super(props);
     this.state = {
-      //change these values back to null, just api json for testing
-      //will try to load values from local storage, or else just init with null values
-
-      //things to get from the form
-      email: localStorage.getItem('email') || apiKey.email,
-      apiKey: localStorage.getItem('apiKey') || apiKey.key,
-      rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,
-      
-      lat: localStorage.getItem('lat') || apiKey.lat,
-      lon: localStorage.getItem('lon') || apiKey.lon,
-      distance: localStorage.getItem('distance') || apiKey.distance,
-      maxResults: localStorage.getItem('maxResults') || 50,
+     
+      //form inputs
+      email: '',
+      apiKey: '',
+      rememberMe: null, 
+      lat: null,
+      lon: null,
+      distance: null,
+      maxResults: null,
 
       //things to fetch
-      name: localStorage.getItem('name') || null,
-      memberSince: localStorage.getItem('memberSince') || null,
-      userUrl: localStorage.getItem('userUrl') || null,
+      name: localStorage.getItem('name') || '',
+      memberSince: localStorage.getItem('memberSince') || '',
+      userUrl: localStorage.getItem('userUrl') || '',
 
       recList: JSON.parse(localStorage.getItem('recList')) || [],
       flashGrade: localStorage.getItem('flashGrade') || 0,
@@ -85,9 +82,7 @@ export default class UserForm extends React.PureComponent{
       haveResults: (localStorage.getItem('haveResults')==='true') || false,
     }
 
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
-    this.handleCheck = this.handleCheck.bind(this);
     this.handleChangeTab = this.handleChangeTab.bind(this);
     this.handleChangePage = this.handleChangePage.bind(this);
     this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
@@ -112,19 +107,56 @@ export default class UserForm extends React.PureComponent{
   }
 
   /////------------------------------------------------
-  //Form (form.js) sate controllers
-  handleFormSubmit(event){
+  //Form (form.js) state controllers
+  handleFormSubmit(values, {setSubmitting }){
     console.log("submit button clicked");
-    event.preventDefault();
     
     this.setState({
       loading:true
     });
-
-    //if recList or name are missing from local storage, then make the APi calls
-    //this is only for testing and should be removed later
-    //the form should send a new api query because we aren't keeping track of changed form variables
-    if( (localStorage.getItem('recList')===null) || (localStorage.getItem('name')===null) ){
+    
+    this.setState({
+      email: values.email,
+      apiKey: values.apiKey,
+      rememberMe: values.rememberMe,
+      lat: values.lat,
+      lon: values.lon,
+      distance: values.distance,
+      maxResults: values.maxResults
+    });
+    //}, ()=>console.log('state:',this.state));
+    
+    console.log('local storage bool', 
+      (localStorage.getItem('email')!==this.state.email),
+      (localStorage.getItem('apiKey')!==this.state.apiKey),
+      (localStorage.getItem('rememberMe')!==this.state.rememberMe.toString()),
+      (localStorage.getItem('lat')!==this.state.lat),
+      (localStorage.getItem('lon')!==this.state.lon),
+      (localStorage.getItem('distance')!==this.state.distance),
+      (localStorage.getItem('maxResults')!==this.state.maxResults),
+      (localStorage.getItem('name')!==this.state.name),
+      (localStorage.getItem('memberSince')!==this.state.memberSince),
+      (localStorage.getItem('userUrl')!==this.state.userUrl),
+      (localStorage.getItem('recList')!==JSON.stringify(this.state.recList)),
+      (localStorage.getItem('flashGrade')!==this.state.flashGrade.toString()),
+      (localStorage.getItem('projectGrade')!==this.state.projectGrade.toString())
+    )
+    //if anything is different in local storage then fetch data again.
+    if( 
+      (localStorage.getItem('email')!==this.state.email)||
+      (localStorage.getItem('apiKey')!==this.state.apiKey)||
+      (localStorage.getItem('rememberMe')!==this.state.rememberMe.toString())||
+      (localStorage.getItem('lat')!==this.state.lat)||
+      (localStorage.getItem('lon')!==this.state.lon)||
+      (localStorage.getItem('distance')!==this.state.distance)||
+      (localStorage.getItem('maxResults')!==this.state.maxResults)||
+      (localStorage.getItem('name')!==this.state.name)||
+      (localStorage.getItem('memberSince')!==this.state.memberSince)||
+      (localStorage.getItem('userUrl')!==this.state.userUrl)||
+      (localStorage.getItem('recList')!==JSON.stringify(this.state.recList))||
+      (localStorage.getItem('flashGrade')!==this.state.flashGrade.toString())||
+      (localStorage.getItem('projectGrade')!==this.state.projectGrade.toString())
+    ){
       this.getName();
       this.getClimbs();
     }
@@ -153,25 +185,11 @@ export default class UserForm extends React.PureComponent{
     else{
       localStorage.clear();
     }
-    
-  }
-  
-  handleInputChange(event) {
-    this.setState({
-      [event.target.name] : event.target.value
-    });
-  }
-  
-  handleCheck(event){
-    this.setState({
-      [event.target.name]: event.target.checked
-    });
 
-    //you'd think this should be !this.state.rememberMe but for some reason this works
-    if( this.state.rememberMe ){
-      localStorage.clear()
-    }
+    setSubmitting(false);    
   }
+  
+  
   ////-------------------------------------------------------- 
   //API call/ functions
   getName(){
@@ -458,18 +476,21 @@ export default class UserForm extends React.PureComponent{
               style={{ minHeight: '60vh' }}
             >
               <Grid item>
-                <FormFieldOutline
+                <FormikForm
                   handleFormSubmit={this.handleFormSubmit}
-                  handleInputChange={this.handleInputChange}
-                  handleCheck={this.handleCheck}
-                  email={this.state.email}
-                  apiKey={this.state.apiKey}
-                  rememberMe={this.state.rememberMe}
-                  lat={this.state.lat}
-                  lon={this.state.lon}
-                  distance={this.state.distance}
-                  maxResults={this.state.maxResults}
                 />
+                {/* <FormFieldOutline */}
+                {/*   handleFormSubmit={this.handleFormSubmit} */}
+                {/*   handleInputChange={this.handleInputChange} */}
+                {/*   handleCheck={this.handleCheck} */}
+                {/*   email={this.state.email} */}
+                {/*   apiKey={this.state.apiKey} */}
+                {/*   rememberMe={this.state.rememberMe} */}
+                {/*   lat={this.state.lat} */}
+                {/*   lon={this.state.lon} */}
+                {/*   distance={this.state.distance} */}
+                {/*   maxResults={this.state.maxResults} */}
+                {/* /> */}
               </Grid>
               <Grid item>
                 <LoadingSpinner load={this.state.loading}/>

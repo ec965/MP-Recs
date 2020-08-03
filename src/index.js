@@ -1,18 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import UserForm from './app'; 
-import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import blueGrey from '@material-ui/core/colors/blueGrey';
+import deepPurple from '@material-ui/core/colors/deepPurple';
+
+const theme = createMuiTheme({
+  palette:{
+    primary: {
+      main: blueGrey[700],
+    },
+    secondary: {
+      main: deepPurple[400],
+    },
+  },
+});
 
 
-import apiKey from './apiKey.json';
-//create a JSON called apiKey.json in ./src/ with format:
-/*
-{
-  "email":"email@email.com",
-  "key":"your_mp_apikey"
-}
-*/
+
 
 
 class App extends React.Component{
@@ -20,7 +26,9 @@ class App extends React.Component{
     return(
       <React.Fragment>
         <CssBaseline/>
-          <UserForm/>
+          <ThemeProvider theme={theme}>
+            <UserForm/>
+          </ThemeProvider>
       </React.Fragment>
     );
   }

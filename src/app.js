@@ -70,7 +70,7 @@ export default class UserForm extends React.PureComponent{
         getToDos:null
       },
       
-      currentTab: 0,  //change this back to zero before release
+      currentTab: 1,  //change this back to zero before release
 
       //Results (dataTable.js) state controllers
       currentPage: 0,
@@ -479,18 +479,6 @@ export default class UserForm extends React.PureComponent{
                 <FormikForm
                   handleFormSubmit={this.handleFormSubmit}
                 />
-                {/* <FormFieldOutline */}
-                {/*   handleFormSubmit={this.handleFormSubmit} */}
-                {/*   handleInputChange={this.handleInputChange} */}
-                {/*   handleCheck={this.handleCheck} */}
-                {/*   email={this.state.email} */}
-                {/*   apiKey={this.state.apiKey} */}
-                {/*   rememberMe={this.state.rememberMe} */}
-                {/*   lat={this.state.lat} */}
-                {/*   lon={this.state.lon} */}
-                {/*   distance={this.state.distance} */}
-                {/*   maxResults={this.state.maxResults} */}
-                {/* /> */}
               </Grid>
               <Grid item>
                 <LoadingSpinner load={this.state.loading}/>
@@ -511,16 +499,13 @@ export default class UserForm extends React.PureComponent{
                 justify="center"
               >
                 <Grid item>
-                  <UserInformation 
+                  <RouteTable
                     name={this.state.name} 
                     memberSince={this.state.memberSince}
                     userUrl={this.state.userUrl}
                     projectGrade={this.state.projectGrade}
                     flashGrade={this.state.flashGrade}
-                  />
-                </Grid>
-                <Grid item>
-                  <RouteTable
+                    
                     align="justify"
                     recList={this.state.recList}
                     page={this.state.currentPage}

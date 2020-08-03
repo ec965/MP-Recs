@@ -5,8 +5,6 @@ import AppBar from '@material-ui/core/AppBar';
 import SearchIcon from '@material-ui/icons/Search';
 import ListIcon from '@material-ui/icons/List';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
 
 function TabPanel(props){
   return(

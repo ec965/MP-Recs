@@ -87,7 +87,7 @@ export default function FormikForm (props){
     handleFormSubmit
   } = props;
   return(
-    <Paper>
+    <Paper className={classes.root}>
       <Formik
       //will try to load values from local storage, or else just init with null values
       //change these values back to null, just api json for testing

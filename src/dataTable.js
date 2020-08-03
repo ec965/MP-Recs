@@ -22,18 +22,17 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import YouTubeIcon from '@material-ui/icons/YouTube';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-
-import { makeStyles } from '@material-ui/core/styles';
+import UserInformation from './userinfo';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles, } from '@material-ui/core/styles';
 
 const useStyles=makeStyles({
   root:{
-    // paddingTop: 10,
+    marginTop: 20,
+    paddingTop:10,
   },
   tableContainer:{
-    // paddingRight:10,
-    // paddingLeft:10,
   },
   tableCellHeading:{
     padding:10,
@@ -197,7 +196,9 @@ function RouteTableCell (props){
 
 
 export default function RouteTable(props){
-  const { align, recList, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } = props;
+  const { align, recList, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
+    userUrl, name, memberSince, flashGrade, projectGrade
+  } = props;
   const classes=useStyles();
 
   
@@ -205,6 +206,13 @@ export default function RouteTable(props){
 
   return(
     <Paper className={classes.root}>
+      <UserInformation
+        userUrl={userUrl}
+        name={name}
+        memberSince={memberSince}
+        flashGrade={flashGrade}
+        projectGrade={projectGrade}
+      />
       <TableContainer className={classes.tableContainer}>
         <Table size="small" padding="none">
           <TableHead>

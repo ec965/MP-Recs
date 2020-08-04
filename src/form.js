@@ -12,6 +12,8 @@ import apiKey from './apiKey.json';
 //Formik
 import { Formik, Form, useField } from 'formik';
 import * as Yup from 'yup';
+//icons
+import MyLocationIcon from '@material-ui/icons/MyLocation';
 
 const useStyles = makeStyles({
   root:{
@@ -92,7 +94,7 @@ export default function FormikForm (props){
       //change these values back to null, just api json for testing
         initialValues={{
           email: localStorage.getItem('email') || apiKey.email, 
-          apiKey: localStorage.getItem('apiKey') || apiKey.key,
+          // apiKey: localStorage.getItem('apiKey') || apiKey.key,
           rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,    
           lat: localStorage.getItem('lat') || apiKey.lat,
           lon: localStorage.getItem('lon') || apiKey.lon,
@@ -104,8 +106,8 @@ export default function FormikForm (props){
           email: Yup.string()
             .email("This isn't an email")
             .required('Required'),
-          apiKey: Yup.string()
-            .required('Required'),
+          // apiKey: Yup.string()
+          //   .required('Required'),
           lat: Yup.number()
             .required('Required')
             .min(-90,'Too lateral, enter a higher number')
@@ -142,14 +144,14 @@ export default function FormikForm (props){
                 autoFocus={true}
               />
             </Grid>
-            <Grid item>
-              <UserFormikField
-                id="apiKey"
-                name="apiKey"
-                label="API Key"
-              />
-            </Grid>
-            <Grid item >
+            {/* <Grid item> */}
+            {/*   <UserFormikField */}
+            {/*     id="apiKey" */}
+            {/*     name="apiKey" */}
+            {/*     label="API Key" */}
+            {/*   /> */}
+            {/* </Grid> */}
+            <Grid item xs >
               <UserFormikCheckbox
                 name="rememberMe"
                 id="rememberMe"
@@ -177,6 +179,13 @@ export default function FormikForm (props){
                 label="Longitude"
               />
             </Grid>
+          </Grid>
+          <Grid container 
+            direction="row" 
+            justify="center" 
+            alignItems="center" 
+            spacing={1}
+          >
             <Grid item>
               <UserFormikField
                 id="distance"

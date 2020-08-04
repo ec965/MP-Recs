@@ -1,4 +1,5 @@
 import React from 'react';
+import apiKey from './apiKey.json';
 //material UI
 import Grid from '@material-ui/core/Grid';
 //my stuff
@@ -15,7 +16,7 @@ export default class UserForm extends React.PureComponent{
      
       //form inputs
       email: '',
-      apiKey: '',
+      apiKey: apiKey.key,
       rememberMe: null, 
       lat: null,
       lon: null,
@@ -47,7 +48,7 @@ export default class UserForm extends React.PureComponent{
         getToDos:null,
       },
       
-      currentTab: 1,  //change this back to zero before release
+      currentTab: 0,  //change this back to zero before release
 
       //Results (dataTable.js) state controllers
       currentPage: 0,
@@ -105,7 +106,6 @@ export default class UserForm extends React.PureComponent{
     
     console.log('local storage bool', 
       (localStorage.getItem('email')!==this.state.email),
-      (localStorage.getItem('apiKey')!==this.state.apiKey),
       (localStorage.getItem('rememberMe')!==this.state.rememberMe.toString()),
       (localStorage.getItem('lat')!==this.state.lat),
       (localStorage.getItem('lon')!==this.state.lon),
@@ -118,7 +118,6 @@ export default class UserForm extends React.PureComponent{
     //if anything is different in local storage then fetch data again.
     if( 
       (localStorage.getItem('email')!==this.state.email)||
-      (localStorage.getItem('apiKey')!==this.state.apiKey)||
       (localStorage.getItem('rememberMe')!==this.state.rememberMe.toString())||
       (localStorage.getItem('lat')!==this.state.lat)||
       (localStorage.getItem('lon')!==this.state.lon)||
@@ -145,7 +144,6 @@ export default class UserForm extends React.PureComponent{
     //these same instructions are called within getName and getClimbs b/c of a-sync
     if( this.state.rememberMe ){
       localStorage.setItem( 'email', this.state.email );
-      localStorage.setItem( 'apiKey', this.state.apiKey );
       localStorage.setItem( 'rememberMe', this.state.rememberMe);
       localStorage.setItem( 'lat', this.state.lat);
       localStorage.setItem( 'lon', this.state.lon);

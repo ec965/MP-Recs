@@ -8,12 +8,11 @@ const useStyles=makeStyles({
   },
 });
 export default function LoadingSpinner(props){
-  const { load } = props;
   const classes=useStyles();
 
   return(
-    <div className={classes.root}>
-      {load && <CircularProgress/>}
-    </div>
+    <React.Fragment>
+      <CircularProgress className={classes.root} />
+    </React.Fragment>
   );
 }

@@ -8,9 +8,6 @@ import FormikForm from './form';
 import LoadingSpinner from './loading'; 
 //CSS dependencies
 
-import apiKey from './apiKey.json';
-
-
 export default class UserForm extends React.PureComponent{
   constructor(props){
     super(props);
@@ -511,7 +508,7 @@ export default class UserForm extends React.PureComponent{
                 />
               </Grid>
               <Grid item>
-                <LoadingSpinner load={this.state.loading}/>
+                {this.state.loading && <LoadingSpinner/>}
               </Grid>
             </Grid>
           }

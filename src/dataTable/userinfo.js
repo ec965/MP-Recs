@@ -1,25 +1,25 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
 
-const useStyles=makeStyles({
-  root:{
-    marginTop: 20,
-    // marginBottom: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingRight: 16,
-    paddingLeft: 16,
-  },
-});
+// const useStyles=makeStyles({
+//   root:{
+//     marginTop: 20,
+//     // marginBottom: 10,
+//     paddingTop: 10,
+//     paddingBottom: 10,
+//     paddingRight: 16,
+//     paddingLeft: 16,
+//   },
+// });
 
 export default function UserInformation(props){
-  let memberDate = new Date(props.memberSince);
+  // let memberDate = new Date(props.memberSince);
   const { member } = props
-  const classes=useStyles();
+  // const classes=useStyles();
   
   return(
     <Toolbar>

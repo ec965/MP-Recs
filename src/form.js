@@ -3,7 +3,6 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -97,7 +96,7 @@ export default function FormikForm (props){
           rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,    
           lat: localStorage.getItem('lat') || apiKey.lat,
           lon: localStorage.getItem('lon') || apiKey.lon,
-          distance: localStorage.getItem('distance') || apiKey.distance,
+          distance: localStorage.getItem('distance') || apiKey.distance || 69,
           maxResults: localStorage.getItem('maxResults') || 50,
                     
         }}

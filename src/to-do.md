@@ -1,5 +1,7 @@
 # to-do
 4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
+  a. hover for detailedforecast
+2. find my long/lat - get location javascript thingy as a button on the form page
 1. username and email options for query?
 2. setup global theme and style
 5. set currentTab back to 0 after testing

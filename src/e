@@ -1,0 +1,11 @@
+<div class="box">
+
+
+
+box :{
+  border: color
+  
+
+<div style={gird prop}>
+  {children}
+</div>

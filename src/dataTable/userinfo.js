@@ -18,6 +18,7 @@ const useStyles=makeStyles({
 
 export default function UserInformation(props){
   let memberDate = new Date(props.memberSince);
+  const { member } = props
   const classes=useStyles();
   
   return(
@@ -27,8 +28,8 @@ export default function UserInformation(props){
         alignContent="flex-start"
       >
         <Grid item>
-          <Link href={props.userUrl} target="_blank">
-            <Typography variant="h5">{props.name}</Typography>
+          <Link href={member.userUrl} target="_blank">
+            <Typography variant="h5">{member.name}</Typography>
           </Link>
         </Grid>
         <Grid item>

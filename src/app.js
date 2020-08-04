@@ -1,33 +1,14 @@
 import React from 'react';
 //material UI
 import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
 //my stuff
-import UserInformation from './userinfo';
-import RouteTable from './dataTable'; 
+import RouteTable from './dataTable/index'; 
 import IconTabs from './tabs'; 
 import FormikForm from './form'; 
 import LoadingSpinner from './loading'; 
 //CSS dependencies
 
 import apiKey from './apiKey.json';
-
-// function UserFormField(props){
-//   return(
-//     <TextField
-//       variant="outlined"
-//       margin="normal"
-//       size="small"
-//       id={props.var}
-//       label={props.label}
-//       name={props.var}
-//       autoComplete={props.autoComplete}
-//       autoFocus={props.autoFocus}
-//       defaultValue={props.stateVar}
-//       onChange={props.onChange}
-//     />
-//   );
-// }
 
 
 export default class UserForm extends React.PureComponent{
@@ -45,9 +26,7 @@ export default class UserForm extends React.PureComponent{
       maxResults: null,
 
       //things to fetch
-      name: localStorage.getItem('name') || '',
-      memberSince: localStorage.getItem('memberSince') || '',
-      userUrl: localStorage.getItem('userUrl') || '',
+      member: JSON.parse(localStorage.getItem('member')) || '', 
 
       recList: JSON.parse(localStorage.getItem('recList')) || [],
       flashGrade: localStorage.getItem('flashGrade') || 0,
@@ -59,7 +38,8 @@ export default class UserForm extends React.PureComponent{
         getTicks: null,
         getRoutes: null,
         getRoutesForLatLon: null,
-        getToDos: null
+        getToDos: null,
+        weather: null,
       },
 
       apiError: {
@@ -67,7 +47,7 @@ export default class UserForm extends React.PureComponent{
         getTicks: null,
         getRoutes: null,
         getRoutesForLatLon: null,
-        getToDos:null
+        getToDos:null,
       },
       
       currentTab: 1,  //change this back to zero before release
@@ -134,10 +114,7 @@ export default class UserForm extends React.PureComponent{
       (localStorage.getItem('lon')!==this.state.lon),
       (localStorage.getItem('distance')!==this.state.distance),
       (localStorage.getItem('maxResults')!==this.state.maxResults),
-      (localStorage.getItem('name')!==this.state.name),
-      (localStorage.getItem('memberSince')!==this.state.memberSince),
-      (localStorage.getItem('userUrl')!==this.state.userUrl),
-      (localStorage.getItem('recList')!==JSON.stringify(this.state.recList)),
+      (localStorage.getItem('member')!==JSON.stringify(this.state.member)),
       (localStorage.getItem('flashGrade')!==this.state.flashGrade.toString()),
       (localStorage.getItem('projectGrade')!==this.state.projectGrade.toString())
     )
@@ -150,10 +127,7 @@ export default class UserForm extends React.PureComponent{
       (localStorage.getItem('lon')!==this.state.lon)||
       (localStorage.getItem('distance')!==this.state.distance)||
       (localStorage.getItem('maxResults')!==this.state.maxResults)||
-      (localStorage.getItem('name')!==this.state.name)||
-      (localStorage.getItem('memberSince')!==this.state.memberSince)||
-      (localStorage.getItem('userUrl')!==this.state.userUrl)||
-      (localStorage.getItem('recList')!==JSON.stringify(this.state.recList))||
+      (localStorage.getItem('member')!==JSON.stringify(this.state.member))||
       (localStorage.getItem('flashGrade')!==this.state.flashGrade.toString())||
       (localStorage.getItem('projectGrade')!==this.state.projectGrade.toString())
     ){
@@ -200,15 +174,11 @@ export default class UserForm extends React.PureComponent{
           if(data.success === 1){
             //console.log(data);
             this.setState({
-              name: data.name,
-              memberSince: data.memberSince,
-              userUrl: data.url, 
+              member: data
             });
 
             if( this.state.rememberMe ){
-              localStorage.setItem( 'name', this.state.name );
-              localStorage.setItem( 'memberSince', this.state.memberSince );
-              localStorage.setItem( 'userUrl', this.state.userUrl );
+              localStorage.setItem( 'member', JSON.stringify(this.state.member) );
             }
             else{
               localStorage.clear();
@@ -233,6 +203,51 @@ export default class UserForm extends React.PureComponent{
       .catch(console.error);
   }
 
+  getWeather(routeList, routeListIndex){
+    //API documentation: https://www.weather.gov/documentation/services-web-api
+    if(routeListIndex > routeList.length-1){
+      return;
+    }
+
+    let lat=routeList[routeListIndex].latitude;
+    let lon = routeList[routeListIndex].longitude;
+
+    let fetchString = 'https://api.weather.gov/points/' + lat + ',' + lon;
+    
+    fetch(fetchString)
+      .then(res => res.json())
+      .then(
+        (data) => {
+          fetch(data.properties.forecast)
+            .then( res=> res.json())
+            .then(
+              (data) => {
+                routeList[routeListIndex].weather = data.properties.periods;
+                console.log(routeListIndex);
+                this.getWeather(routeList, routeListIndex+1);
+              },
+              (error) => {
+                this.setState({
+                  fetchError: {
+                    weather: true
+                  }
+                });
+              }
+            )
+            .catch(console.error);
+          },
+          (error) => {
+            this.setState({
+              fetchError: {
+                weather: true
+              }
+            });
+          }
+      )
+      .catch(console.error);
+  }
+
+              
   getClimbs(){
     //get the users ticks
     console.log("getting ticks");
@@ -241,13 +256,12 @@ export default class UserForm extends React.PureComponent{
       .then(
         (data) => {
             if (data.success === 1){
-              var i;
               var tickList = data.ticks; //we will need this later to remove boulders the user has already ticked
 
               //get the route data from the ticks
               //generate the fetch url
               var fetchString = 'https://www.mountainproject.com/data/get-routes?routeIds=';
-              for ( i=0; i<data.ticks.length; i++){
+              for (let i=0; i<data.ticks.length; i++){
                 fetchString += data.ticks[i].routeId + ',';
               }
               //remove extra comma
@@ -263,7 +277,7 @@ export default class UserForm extends React.PureComponent{
                       var gradeArray = new Array(18).fill(0);
                       
                       //generate grade estimations for bouldering
-                      for(i=0; i<data.routes.length; i++){
+                      for(let i=0; i<data.routes.length; i++){
                         if( data.routes[i].type.includes("Boulder") ){ //some climbs will be listed as both TR (top rope) and boulder for high balls
                           var gradeStart = data.routes[i].rating.indexOf("V",0); //get the index of the [V] in V13
                           var grade = data.routes[i].rating.substring( (gradeStart+1), (gradeStart+3) ); //get the grade [13] in V13
@@ -282,7 +296,7 @@ export default class UserForm extends React.PureComponent{
                       //see construction for grade ranges
                       var mostGrade = 0;
                       var highestGrade = 0;
-                      for(i=0; i < gradeArray.length; i++){
+                      for(let i=0; i < gradeArray.length; i++){
                         if(gradeArray[i] > gradeArray[mostGrade]){
                           mostGrade = i;
                         }
@@ -301,12 +315,12 @@ export default class UserForm extends React.PureComponent{
                       //this will be done using get-routes-for-lat-lon
                       //most variables for this fetch string will be coming from a form
                       fetchString = "https://www.mountainproject.com/data/get-routes-for-lat-lon?"
-                      fetchString += "lat=" + this.state.lat + "&lon=" + this.state.lon;
-                      fetchString += "&maxDistance=" + this.state.distance;
-                      fetchString += "&maxResults=" + this.state.maxResults; //perhaps give an option to return more boulders later
-                      fetchString += "&minDiff=V" + (this.state.flashGrade);
-                      fetchString += "&maxDiff=V" + (this.state.projectGrade);
-                      fetchString += "&key=" + this.state.apiKey;
+                        + "lat=" + this.state.lat + "&lon=" + this.state.lon
+                        + "&maxDistance=" + this.state.distance
+                        + "&maxResults=" + this.state.maxResults //perhaps give an option to return more boulders later
+                        + "&minDiff=V" + (this.state.flashGrade)
+                        + "&maxDiff=V" + (this.state.projectGrade)
+                        + "&key=" + this.state.apiKey;
                       
                       console.log("getting routes from lat lon");
                       //get-routes-for-lat-lon returns only the highest rated climbs
@@ -315,19 +329,34 @@ export default class UserForm extends React.PureComponent{
                         .then(
                           (data) => {
                             if (data.success === 1){
-                             
+                              
+                              let tickListIdSet = new Set();
+                              for(let i=0; i<tickList.length; i++){
+                                tickListIdSet.add(tickList[i].routeId);
+                              }
+                              console.log(tickListIdSet);
+                            
                               //we don't need to remove non-boulder problems because routes-for-lat-lon can sort by boulders using minDiff & maxDiff
-                              for(i=data.routes.length-1; i>=0; i--){
+                              for(let i=data.routes.length-1; i>=0; i--){
                                 //remove climbs that were already ticked
-                                for( var j=0; j<tickList.length; j++ ){
-                                  if(data.routes[i].id === tickList[j].routeId){
-                                    data.routes.splice(i,1);
-                                    break;
-                                  }
+                                if( tickListIdSet.has( data.routes[i].id) ){
+                                  data.routes.splice(i,1);
+                                }
+                                
+                                // swap the V grade and YDS grade position
+                                else if( data.routes[i].rating.includes("5.") ){
+                                   let ratingArr = data.routes[i].rating.split(" ");
+                                   if( ratingArr.length >= 1 ){
+                                     let swp = ratingArr[0];
+                                     ratingArr[0] = ratingArr[1];
+                                     ratingArr[1] = swp;
+                                   }
+                                   data.routes[i].rating = ratingArr.join().replace(/,/g, ' ');
                                 }
                               }
+
                               
-                              var todoRouteList = data.routes;
+                              var dataRouteList = data.routes;
                               //we still need to cross references this list with the to-do list so that the user can be notified if a climb is on their to-do list                              
                               fetch('https://www.mountainproject.com/data/get-to-dos?email=' + this.state.email + '&key=' + this.state.apiKey)
                                 .then(res=>res.json())
@@ -337,23 +366,24 @@ export default class UserForm extends React.PureComponent{
                                       
                                       //put the toDo list into a set for faster checking
                                       let toDoSet = new Set();
-                                      for(i=0; i<data.toDos.length; i++){
+                                      for(let i=0; i<data.toDos.length; i++){
                                         toDoSet.add(data.toDos[i]);
                                       }
 
                                       //add a new var to the object that denotes if it is or is not on the user's todo list
-                                      for( i=0; i<todoRouteList.length; i++ ){
-                                        if( toDoSet.has( todoRouteList[i].id ) ){
-                                          todoRouteList[i].toDo = true;
+                                      for(let i=0; i<dataRouteList.length; i++ ){
+                                        if( toDoSet.has( dataRouteList[i].id ) ){
+                                          dataRouteList[i].toDo = true;
                                         }
                                         else{
-                                          todoRouteList[i].toDo = false;
+                                          dataRouteList[i].toDo = false;
                                         }
+
                                       }
                                       
 
                                       //this is the final array we need!
-                                      this.setState({recList:todoRouteList});
+                                      this.setState({recList:dataRouteList});
                                       console.log(this.state.recList);
                                       if( this.state.rememberMe ){
                                         localStorage.setItem( 'recList', JSON.stringify(this.state.recList) );
@@ -500,9 +530,8 @@ export default class UserForm extends React.PureComponent{
               >
                 <Grid item>
                   <RouteTable
-                    name={this.state.name} 
-                    memberSince={this.state.memberSince}
-                    userUrl={this.state.userUrl}
+                    member={this.state.member}
+
                     projectGrade={this.state.projectGrade}
                     flashGrade={this.state.flashGrade}
                     

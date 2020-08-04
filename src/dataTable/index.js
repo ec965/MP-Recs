@@ -155,6 +155,90 @@ TablePageControls.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
+function ButtonLinks(props){
+  const { name, locationArr, lat, lon  } = props;
+  return(
+    
+    <Grid container item
+      direction="row"
+      justify="center"
+      alignItems="center"
+      spacing={3}
+    >
+      <Grid item>
+        <Link 
+          href={'https://www.youtube.com/results?search_query='
+            + name + '+'
+            + locationArr[locationArr.length-1] + '+'
+            + locationArr[locationArr.length-2]
+          }
+          target="_blank" >
+          <Button variant="contained" style={{backgroundColor:'#d32f2f', color:'#fff'}}>YouTube</Button>
+        </Link>
+      </Grid>
+      <Grid item>
+        <Link 
+          href={'https://vimeo.com/search?q='
+            + name + '+'
+            + locationArr[locationArr.length-1] + '+'
+            + locationArr[locationArr.length-2]
+          }
+          target="_blank" >
+          <Button variant="contained" style={{backgroundColor:'#19B7EA', color:'#fff'}}>Vimeo</Button>
+        </Link>
+      </Grid>
+      <Grid item>
+        <Link
+          href={'https://www.google.com/maps/@'
+              + lat + ',' + lon + ',18z'}
+          target="_blank"
+        >
+          <Button variant="contained" style={{backgroundColor:'#0F9D58', color:'#fff'}}>
+            Maps
+          </Button>
+        </Link>
+      </Grid>
+      <Grid item>
+        <Link
+          href={'https://forecast.weather.gov/MapClick.php?lon='
+              + lon + '&lat=' + lat}
+          target="_blank"
+        >
+          <Button variant="contained" style={{backgroundColor:'#0d47a1', color:'#fff'}}>
+            Weather
+          </Button>
+        </Link>
+      </Grid>
+    </Grid>
+  );
+}
+
+function DayWeatherInfo(props){
+  const { day } = props;
+  return(
+    <Grid container 
+      justify="center"
+      alignItems="center"
+      direction="column"
+      spacing={1}
+    >
+      <Grid item xs>
+        <img src={day.icon} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',maxWidth:'3em'}}></img>
+      </Grid>
+      <Grid item xs>
+        <Typography variant='caption'>
+          {day.name}
+        </Typography>
+      </Grid>
+      <Grid item xs>
+        <Typography variant='caption'>
+          {day.tempHigh + '/' + day.tempLow + 'F'}
+        </Typography>
+      </Grid>
+    </Grid>
+  );
+}
+
 
 function RouteTableRow (props){
   const classes=useStyles();
@@ -190,14 +274,50 @@ function RouteTableRow (props){
                   dayNames.add('Sunday');
                   
                   let dispWeather = [];
-
-                  for(let i=0; i<data.properties.periods.length; i++){
-                    if( dayNames.has(data.properties.period[i].name) ){
-                      dispWeather.push({name: data.properties.period[i].name, temperature: data.properties[i].temperature, icon: data.properties[i].icon});
+                  
+                  //starting on a day time
+                  if(data.properties.periods[0].isDaytime){
+                    dispWeather[0] = {
+                      name: 'Today',
+                      tempHigh: data.properties.periods[0].temperature,
+                      tempHighNote: data.properties.periods[0].shortForecast,
+                      icon: data.properties.periods[0].icon,
+                      tempLow: data.properties.periods[1].temperature,
+                      tempLowNote: data.properties.periods[1].shortForecast,
+                    };
+                    for(let i=2; i<data.properties.periods.length; i+=2){
+                      dispWeather[i/2]={
+                        name: data.properties.periods[i].name.substring(0,3),
+                        tempHigh: data.properties.periods[i].temperature,
+                        tempHighNote: data.properties.periods[i].shortForecast,
+                        icon: data.properties.periods[i].icon,
+                        tempLow: data.properties.periods[i+1].temperature,
+                        tempLowNote: data.properties.periods[i+1].shortForecast,
+                      };
+                    }
+                  }
+                  //starting on a night time
+                  else{
+                    dispWeather[0] = {
+                      name: 'Tonight',
+                      tempHigh: '',
+                      tempHighNote: '',
+                      icon: data.properties.periods[0].icon,
+                      tempLow: data.properties.periods[0].temperature,
+                      tempLowNote: data.properties.periods[0].shortForecast,
+                    };
+                    for(let i=1; i<data.properties.periods.length-1; i+= 2){
+                      dispWeather[(i+1)/2]={
+                        name: data.properties.periods[i].name.substring(0,3),
+                        tempHigh: data.properties.periods[i].temperature,
+                        tempHighNote: data.properties.periods[i].shortForecast,
+                        icon: data.properties.periods[i].icon,
+                        tempLow: data.properties.periods[i+1].temperature,
+                        tempLowNote: data.properties.periods[i+1].shortForecast,
+                      };
                     }
                   }
                   console.log(dispWeather);
-                    
                   setWeather(dispWeather);
                 },
                 (error) => {
@@ -215,46 +335,12 @@ function RouteTableRow (props){
   }
 
 
-  // let displayWeather = [
-  //   {day:'Monday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Tuesday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Wednesday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Thursday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Friday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Saturday', tempHigh: null, tempLow: null, image:null},
-  //   {day:'Sunday', tempHigh: null, tempLow: null, image:null},
-  // ];
-
-  // for(let i=0; i<weather.length; i++){
-  //   for(let j=0; j<displayWeather.length; j++){
-  //     if( weather.name.includes(displayWeather.day) ){
-  //       if( weather.name.includes('Night') ){
-  //         displayWeather.tempLow = weather.temperature;
-  //       }
-  //       else{
-  //         displayWeather.tempHigh = weather.temperature;
-  //         displayWeather.image = weather.icon;
-  //       }
-  //     }
-  //   }
-  // }
-  // for(let i=0; i<displayWeather.length; i++){
-  //   jsxWeather.push(
-  //     <Grid item>
-  //       <img src={displayWeather.image} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'}}></img>
-  //       <Typography variant='body2'>
-  //         {String(displayWeather.day) + ' ' + String(displayWeather.tempHigh) + '-' + String(displayWeather.tempLow) + 'F'}
-  //       </Typography>
-  //     </Grid>
-  //   );
-  // }
-  
         
   return(
     <React.Fragment>
       <TableRow hover={true} key={route.id}>
         <TableCell>
-          <IconButton size="small" onClick={()=>{setOpen(!open); /*getWeather();*/}}>
+          <IconButton size="small" onClick={()=>{setOpen(!open); getWeather();}}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon/>}
           </IconButton>
         </TableCell>
@@ -293,78 +379,30 @@ function RouteTableRow (props){
           <Collapse in={open} timeout="auto">
             <Box margin={1}>
               <Grid container
-                direction="row"
+                direction="column"
                 justify="center"
-                alignItems="center"
-                spacing={1}
+                alignContent="center"
+                spacing={3}
               >
                 <Grid item>
-                  <Link 
-                    href={'https://www.youtube.com/results?search_query='
-                      + route.name + '+'
-                      + route.location[route.location.length-1] + '+'
-                      + route.location[route.location.length-2]
-                    }
-                    target="_blank" >
-                    <Button variant="contained" style={{backgroundColor:'#d32f2f', color:'#fff'}}>YouTube</Button>
-                  </Link>
+                  <ButtonLinks
+                    name={route.name}
+                    locationArr={route.location}
+                    lat={route.latitude}
+                    lon={route.longitude}
+                  />
                 </Grid>
                 <Grid item>
-                  <Link 
-                    href={'https://vimeo.com/search?q='
-                      + route.name + '+'
-                      + route.location[route.location.length-1] + '+'
-                      + route.location[route.location.length-2]
-                    }
-                    target="_blank" >
-                    <Button variant="contained" style={{backgroundColor:'#19B7EA', color:'#fff'}}>Vimeo</Button>
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    href={'https://www.google.com/maps/@'
-                        + route.latitude + ',' + route.longitude + ',18z'}
-                    target="_blank"
+                  <Grid container
+                    direciton="row"
+                    spacing={3}
                   >
-                    <Button variant="contained" style={{backgroundColor:'#0F9D58', color:'#fff'}}>
-                      Maps
-                    </Button>
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link
-                    href={'https://forecast.weather.gov/MapClick.php?lon='
-                        + route.longitude + '&lat=' + route.latitude}
-                    target="_blank"
-                  >
-                    <Button variant="contained" style={{backgroundColor:'#0d47a1', color:'#fff'}}>
-                      Weather
-                    </Button>
-                  </Link>
-                  {/* <Paper> */}
-                  {/*   <Typography variant="h5"> */}
-                  {/*       Weather */}
-                  {/*   </Typography> */}
-                  {/*   <Grid container */}
-                  {/*     direction="row" */}
-                  {/*     justify="center" */}
-                  {/*     alignItems="center" */}
-                  {/*     spacing={1} */}
-                  {/*   > */}
-                  {/*     {weather.map(( day) => ( */}
-                  {/*       <div key={day.name}> */}
-                  {/*         <Grid item> */}
-                  {/*           <img src={day.icon} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',maxWidth:'25px'}}></img> */}
-                  {/*         </Grid> */}
-                  {/*         <Grid item> */}
-                  {/*           <Typography variant='caption'> */}
-                  {/*             {String(day.name) + ' ' + String(day.temperature) + 'F'} */}
-                  {/*           </Typography> */}
-                  {/*         </Grid> */}
-                  {/*       </div> */}
-                  {/*     ))} */}
-                  {/*   </Grid> */}
-                  {/* </Paper> */}
+                    {weather.map(( day) => (
+                      <Grid item>
+                        < DayWeatherInfo day={day}/>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Grid>
               </Grid>
             </Box>

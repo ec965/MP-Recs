@@ -28,7 +28,7 @@ export default function UserInformation(props){
         alignContent="flex-start"
       >
         <Grid item>
-          <Link href={member.userUrl} target="_blank">
+          <Link href={member.url} target="_blank">
             <Typography variant="h5">{member.name}</Typography>
           </Link>
         </Grid>

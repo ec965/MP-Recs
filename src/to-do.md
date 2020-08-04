@@ -1,6 +1,4 @@
 # to-do
-4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
-  a. hover for detailedforecast
 2. find my long/lat - get location javascript thingy as a button on the form page
 1. username and email options for query?
 2. setup global theme and style
@@ -10,6 +8,8 @@
 1. show loading circle on search tab until route fetch is done
 3. form verification - using formik
 3. data table sorting
+4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
+  a. hover for detailedforecast
 
 # fetch errors:
 1. get-user

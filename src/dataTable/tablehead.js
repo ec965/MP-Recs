@@ -32,13 +32,18 @@ export default function RouteTableHead(props){
             align={align}
             sortDirection={orderBy === heading.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === heading.id}
-              direction={orderBy === heading.id ? order : 'asc'}
-              onClick={createSortHandler(heading.id)}
-            >
-              {heading.label}
-            </TableSortLabel>
+            {heading.id!=='image' 
+              ? 
+              (<TableSortLabel
+                active={orderBy === heading.id}
+                direction={orderBy === heading.id ? order : 'asc'}
+                onClick={createSortHandler(heading.id)}
+              >
+                {heading.label}
+              </TableSortLabel>)
+              :
+              (<>{heading.label}</>)
+            }
           </TableCell>
         ))}
       </TableRow>

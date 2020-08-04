@@ -51,48 +51,45 @@ function ButtonLinks(props){
       spacing={3}
     >
       <Grid item>
-        <Link 
+        <Button 
+          variant="contained" 
+          style={{backgroundColor:'#d32f2f', color:'#fff'}} 
           href={'https://www.youtube.com/results?search_query='
             + name + '+'
             + locationArr[locationArr.length-1] + '+'
-            + locationArr[locationArr.length-2]
-          }
-          target="_blank" >
-          <Button variant="contained" style={{backgroundColor:'#d32f2f', color:'#fff'}}>YouTube</Button>
-        </Link>
+            + locationArr[locationArr.length-2]}
+          target="_blank"
+        >
+          YouTube
+        </Button>
       </Grid>
       <Grid item>
-        <Link 
-          href={'https://vimeo.com/search?q='
-            + name + '+'
-            + locationArr[locationArr.length-1] + '+'
-            + locationArr[locationArr.length-2]
-          }
-          target="_blank" >
-          <Button variant="contained" style={{backgroundColor:'#19B7EA', color:'#fff'}}>Vimeo</Button>
-        </Link>
+        <Button          
+          href={'https://vimeo.com/search?q=' + name + '+' + locationArr[locationArr.length-1] + '+' + locationArr[locationArr.length-2]}
+          target="_blank" 
+          variant="contained" style={{backgroundColor:'#19B7EA', color:'#fff'}}
+        >
+          Vimeo
+        </Button>
       </Grid>
       <Grid item>
-        <Link
+        <Button 
+          variant="contained" 
+          style={{backgroundColor:'#0F9D58', color:'#fff'}}
           href={'https://www.google.com/maps/@'
-              + lat + ',' + lon + ',18z'}
+            + lat + ',' + lon + ',18z'}
           target="_blank"
         >
-          <Button variant="contained" style={{backgroundColor:'#0F9D58', color:'#fff'}}>
-            Maps
-          </Button>
-        </Link>
+          Maps
+        </Button>
       </Grid>
       <Grid item>
-        <Link
-          href={'https://forecast.weather.gov/MapClick.php?lon='
-              + lon + '&lat=' + lat}
+        <Button           
+          href={'https://forecast.weather.gov/MapClick.php?lon=' + lon + '&lat=' + lat}
           target="_blank"
-        >
-          <Button variant="contained" style={{backgroundColor:'#0d47a1', color:'#fff'}}>
-            Weather
-          </Button>
-        </Link>
+          variant="contained" style={{backgroundColor:'#0d47a1', color:'#fff'}}>
+          Weather
+        </Button>
       </Grid>
     </Grid>
   );
@@ -139,10 +136,12 @@ export default function RouteTableRow (props){
     if (weather.length === 0){
       setWeather([1]);
       let fetchString = 'https://api.weather.gov/points/' + route.latitude + ',' + route.longitude;
+      console.log('fetching weather based on lat/lon');
       fetch(fetchString)
         .then(res => res.json())
         .then(
           (data) => {
+            console.log('fetching weather based on grid');
             fetch(data.properties.forecast)
               .then( res=> res.json())
               .then(

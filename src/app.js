@@ -28,7 +28,7 @@ export default class UserForm extends React.PureComponent{
 
       recList: JSON.parse(localStorage.getItem('recList')) || [],
       flashGrade: localStorage.getItem('flashGrade') || 0,
-      projectGrade: localStorage.getItem('projectGrade') || 0,
+      projectGrade: localStorage.getItem('projectGrade') || 17,
 
       //fetch error vars
       fetchError: {
@@ -99,7 +99,9 @@ export default class UserForm extends React.PureComponent{
       lat: values.lat,
       lon: values.lon,
       distance: values.distance,
-      maxResults: values.maxResults
+      maxResults: values.maxResults,
+      flashGrade: values.flashGrade,
+      projectGrade: values.projectGrade,
     });
     //}, ()=>console.log('state:',this.state));
     
@@ -268,41 +270,49 @@ export default class UserForm extends React.PureComponent{
                 .then(
                   (data) => {
                     if (data.success === 1) {
-                      var gradeArray = new Array(18).fill(0);
-                      
-                      //generate grade estimations for bouldering
-                      for(let i=0; i<data.routes.length; i++){
-                        if( data.routes[i].type.includes("Boulder") ){ //some climbs will be listed as both TR (top rope) and boulder for high balls
-                          var gradeStart = data.routes[i].rating.indexOf("V",0); //get the index of the [V] in V13
-                          var grade = data.routes[i].rating.substring( (gradeStart+1), (gradeStart+3) ); //get the grade [13] in V13
-                          var gradeInt = parseInt(grade); //parse the string into an int. for grades < 10, the result from V3 = '3 ' so we parse to remove the space and resolve type errors
+                     
+                      //this connectes to the form, if the user chooses 'Find my grade' then the choice
+                      //will default to -1.
+                      //we don't have to calculate grade if the user already input their desired grades in the form
+                      if( this.state.flashGrade === -1 || this.state.projectGrade === -1){
+                        //generate grade estimations for bouldering
+                        var gradeArray = new Array(18).fill(0);
+                        
+                        for(let i=0; i<data.routes.length; i++){
+                          if( data.routes[i].type.includes("Boulder") ){ //some climbs will be listed as both TR (top rope) and boulder for high balls
+                            var gradeStart = data.routes[i].rating.indexOf("V",0); //get the index of the [V] in V13
+                            var grade = data.routes[i].rating.substring( (gradeStart+1), (gradeStart+3) ); //get the grade [13] in V13
+                            var gradeInt = parseInt(grade); //parse the string into an int. for grades < 10, the result from V3 = '3 ' so we parse to remove the space and resolve type errors
 
-                          //parseInt will parse VB to NaN so we will round that up to V0. I mean those are basically the same grade.
-                          if (isNaN(gradeInt)){
-                            gradeInt = 0;
+                            //parseInt will parse VB to NaN so we will round that up to V0. I mean those are basically the same grade.
+                            if (isNaN(gradeInt)){
+                              gradeInt = 0;
+                            }
+                            
+                            gradeArray[gradeInt] += 1;
                           }
-                          
-                          gradeArray[gradeInt] += 1;
+                        }
+                        //console.log(gradeArray);  
+                        
+                        //see construction for grade ranges
+                        var mostGrade = 0;
+                        var highestGrade = 0;
+                        for(let i=0; i < gradeArray.length; i++){
+                          if(gradeArray[i] > gradeArray[mostGrade]){
+                            mostGrade = i;
+                          }
+                          if(gradeArray[i] !== 0){
+                            highestGrade = i;
+                          }
+                        }
+                        
+                        if (this.state.flashGrade === -1){
+                          this.setState({ flashGrade: mostGrade });
+                        }
+                        if(this.state.projectGrade === -1){
+                          this.setState({ projectGrade: highestGrade + 1 })
                         }
                       }
-                      //console.log(gradeArray);  
-                      
-                      //see construction for grade ranges
-                      var mostGrade = 0;
-                      var highestGrade = 0;
-                      for(let i=0; i < gradeArray.length; i++){
-                        if(gradeArray[i] > gradeArray[mostGrade]){
-                          mostGrade = i;
-                        }
-                        if(gradeArray[i] !== 0){
-                          highestGrade = i;
-                        }
-                      }
-    
-                      this.setState({
-                        flashGrade: mostGrade,
-                        projectGrade: highestGrade+1
-                      });
                       
 
                       //now that we have a recommended grade range, we can get a list of grades in that range

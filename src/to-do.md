@@ -1,5 +1,4 @@
 # to-do
-6. CSS for tooltip
 5. accordian for location list
 3. add button to pre-fill grades
 1. popover hover **fix form
@@ -13,6 +12,7 @@
 3. data table sorting
 4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
 2. find my long/lat - get location javascript thingy as a button on the form page
+6. CSS for tooltip
 
 # fetch errors:
 1. get-user

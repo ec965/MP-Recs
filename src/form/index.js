@@ -1,24 +1,23 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
+// import Typography from '@material-ui/core/Typography';
+// import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 //Formik
-import { Formik, Form, useField } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 //icons
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import IconButton from '@material-ui/core/IconButton';
 //mystuff
-import apiKey from '../apiKey.json';
 import StyleTooltip from './tooltip';
+import UserFormikField from './field';
+import UserFormikCheckbox from './checkbox';
+import UserFormikSelect from './select';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root:{
     paddingLeft: 20,
     paddingRight: 20,
@@ -33,61 +32,10 @@ const useStyles = makeStyles({
   button:{
     // margin:,
   },
-  rememberMe:{
-    marginTop: 5,
-    marginLeft: 5,
-    fontSize: 99,
+  locationButton:{
+    color: theme.palette.info.main,
   },
-});
-
-
-function UserFormikField (props){
-  const [field, meta] = useField(props);
-
-  return(
-    <StyleTooltip title={props.note} show={props.showToolTip}>
-    <TextField
-      variant="outlined"
-      margin="normal"
-      size="small"
-      id={props.id}
-      label={props.label}
-      name={props.name}
-      autoComplete={props.autoComplete}
-      //error handeling
-      error={meta.touched && meta.error}
-      helperText={meta.error}
-      
-      {...field}
-    />
-    </StyleTooltip>
-  );
-}
-
-function UserFormikCheckbox(props){
-  const classes=useStyles();
-  const { name, id, label } = props;
-  const [field, meta] = useField({...props, type: 'checkbox'});
-    
-  return(
-      <FormControlLabel 
-        className={classes.rememberMe}
-        labelPlacement="start"  
-        control={
-        <StyleTooltip title={props.note} arrow show={props.showToolTip}>
-          <Checkbox
-            id={name}
-            name={id}
-            color="primary"
-            {...field}
-          />
-        </StyleTooltip>
-        }
-        label={label}
-      />
-  );
-}
-
+}));
 
 export default function FormikForm (props){
   const classes=useStyles();
@@ -96,6 +44,12 @@ export default function FormikForm (props){
   } = props;
   const [latState, setLat] = React.useState('');
   const [lonState, setLon] = React.useState('');
+  const [emailState, setEmail] = React.useState('');
+  const [rememberState, setRemember] = React.useState(false);
+  const [distanceState, setDistance] = React.useState('');
+  const [maxResState, setMaxRes] = React.useState('');
+  const [flashState, setFlash] = React.useState('');
+  const [projState, setProj] = React.useState('');
 
   //for the get location button
   const getLocation=()=>{
@@ -116,8 +70,9 @@ export default function FormikForm (props){
   const getLocError=(error)=>{
     console.warn(`ERROR(${error.code}): ${error.message}`);
   }
-
-
+  
+  const huecoGrades = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+  
   return(
     <Paper className={classes.root}>
       <Formik
@@ -125,15 +80,17 @@ export default function FormikForm (props){
       //will try to load values from local storage, or else just init with null values
       //change these values back to null, just api json for testing
         initialValues={{
-          email: localStorage.getItem('email') || '',//apiKey.email, 
+          email: localStorage.getItem('email') || emailState,//apiKey.email, 
           // apiKey: localStorage.getItem('apiKey') || apiKey.key,
-          rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,    
-          lat: localStorage.getItem('lat') || latState,//apiKey.lat || ,
-          lon: localStorage.getItem('lon') || lonState,//apiKey.lon,
-          distance: localStorage.getItem('distance') || /*apiKey.distance ||*/ 69,
-          maxResults: localStorage.getItem('maxResults') || 50,
-                    
+          rememberMe: localStorage.getItem('rememberMe') === 'true' || rememberState,    
+          lat: localStorage.getItem('lat') || latState ,//apiKey.lat || ,
+          lon: localStorage.getItem('lon') || lonState ,//apiKey.lon,
+          distance: localStorage.getItem('distance') || distanceState, /*apiKey.distance ||*/
+          maxResults: localStorage.getItem('maxResults')||maxResState,
+          flashGrade: localStorage.getItem('flashGrade') || flashState,
+          projectGrade: localStorage.getItem('projectGrade') || projState,                    
         }}
+
         validationSchema={Yup.object({
           email: Yup.string()
             .email("This isn't an email")
@@ -156,43 +113,73 @@ export default function FormikForm (props){
             .required('Required')
             .integer()
             .max(500, 'Choose less results'),
+          flashGrade: Yup.number()
+            .required('Required')
+            .positive()
+            .min(-1,'Hueco grades go from V0-V17'),
+          projectGrade: Yup.number()
+            .required('Required')
+            .integer()
+            .max(17, 'Hueco grades go from V0-V17'),
           })}
         onSubmit={handleFormSubmit}
       >
+        {({
+          values,
+          setFieldValue,
+        }) => 
+          (
       
         <Form autoComplete="on">
           <Grid container
             direction="column"
             justify="center"
             alignItems="center"
-            spacing={1}
+            spacing={0}
           >
             <Grid container item 
               direction="row" 
-              justify="center" 
-              alignItems="center" 
+              justify="flex-start" 
+              alignItems="center"
+              alignContent="flex-start"
               spacing={2}
             >
-              <Grid item xs={2}/>
-                <Grid item xs={6}>
-                    <UserFormikField
-                      id="email"
-                      name="email"
-                      label="Email"
-                      autoComplete="email"
-                      showToolTip
-                      note="Enter your Mountain Project email"
-                    />
-                </Grid>
-              <Grid item xs={2}>
+              <Grid item xs>
+                  <UserFormikField
+                    id="email"
+                    name="email"
+                    label="Email"
+                    autoComplete="email"
+                    showToolTip
+                    note="Enter your Mountain Project email"
+                  />
+              </Grid>
+              <Grid item xs>
                 <StyleTooltip
                   title="Get my latitude and longitude" show >
-                  <IconButton onClick={()=>getLocation()}>
+                  <IconButton className={classes.locationButton} 
+                    onClick={()=>{
+                      setEmail(values.email);
+                      setRemember(values.rememberMe);
+                      setDistance(values.distance);
+                      setMaxRes(values.maxResults);
+                      setFlash(values.flashGrade);
+                      setProj(values.projectGrade);
+                      // console.log(values);
+
+                      // function getLocSuccess(position){
+                      //   console.log(position.coords);
+                      //   setFieldValue('lat', position.coords.latitude);
+                      //   setFieldValue('lon', position.coords.longitude);
+                      // }
+                      // navigator.geolocation.getCurrentPosition(getLocSuccess);
+                      getLocation();
+                    }}
+                  >
                     <MyLocationIcon/>
                   </IconButton>
                 </StyleTooltip>
               </Grid>
-              <Grid item xs={2}/>
               {/* <Grid item> */}
               {/*   <UserFormikField */}
               {/*     id="apiKey" */}
@@ -204,17 +191,18 @@ export default function FormikForm (props){
             <Grid container item 
               direction="row" 
               justify="center" 
-              alignItems="center" 
+              alignItems="center"
+              alignContent="center"
               spacing={2}
             >
-              <Grid item xs={6}>
+              <Grid item xs>
                 <UserFormikField
                   id="lat"
                   name="lat"
                   label="Latitude"
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <UserFormikField
                   id="lon"
                   name="lon"
@@ -224,11 +212,12 @@ export default function FormikForm (props){
             </Grid>
             <Grid container item 
               direction="row" 
-              justify="center" 
-              alignItems="center" 
+              justify="flex-start" 
+              alignItems="center"
+              alignContent="flex-start"
               spacing={2}
             >
-              <Grid item xs={6}>
+              <Grid item xs>
                 <UserFormikField
                   id="distance"
                   name="distance"
@@ -237,11 +226,35 @@ export default function FormikForm (props){
                   note="Search radius"
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <UserFormikField
                   id="maxResults"
                   name="maxResults"
                   label="Number of Results"
+                />
+              </Grid>
+            </Grid>
+            <Grid container item 
+              direction="row" 
+              justify="flex-start" 
+              alignItems="center"
+              alignContent="flex-start"
+              spacing={2}
+            >
+              <Grid item xs>
+                <UserFormikSelect
+                  id='flashGrade'
+                  name='flashGrade'
+                  label='Flash Grade'
+                  menuItems={huecoGrades}
+                />
+              </Grid>
+              <Grid item xs>
+                <UserFormikSelect
+                  id='projectGrade'
+                  name='projectGrade'
+                  label='Project Grade'
+                  menuItems={huecoGrades}
                 />
               </Grid>
             </Grid>
@@ -253,7 +266,7 @@ export default function FormikForm (props){
               alignContent="center"
               spacing={2}
             >
-              <Grid item xs={6} >
+              <Grid item xs>
                 <UserFormikCheckbox
                   name="rememberMe"
                   id="rememberMe"
@@ -262,7 +275,7 @@ export default function FormikForm (props){
                   showToolTip
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs>
                 <Button
                   className={classes.button}
                   type="submit"
@@ -275,6 +288,7 @@ export default function FormikForm (props){
             </Grid>
           </Grid>
         </Form>
+          )}
       </Formik>
         {/* <Grid container */} 
         {/*   direction="row" */} 

@@ -1,4 +1,6 @@
 # to-do
+6. CSS for tooltip
+5. accordian for location list
 3. add button to pre-fill grades
 1. popover hover **fix form
 1. username and email options for query?

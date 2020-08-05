@@ -8,7 +8,6 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
-import apiKey from './apiKey.json';
 //Formik
 import { Formik, Form, useField } from 'formik';
 import * as Yup from 'yup';
@@ -16,8 +15,8 @@ import * as Yup from 'yup';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import IconButton from '@material-ui/core/IconButton';
 //mystuff
-import HoverPopover from './hoverpopover';
-
+import apiKey from '../apiKey.json';
+import StyleTooltip from './tooltip';
 
 const useStyles = makeStyles({
   root:{
@@ -46,6 +45,7 @@ function UserFormikField (props){
   const [field, meta] = useField(props);
 
   return(
+    <StyleTooltip title={props.note} show={props.showToolTip}>
     <TextField
       variant="outlined"
       margin="normal"
@@ -54,13 +54,13 @@ function UserFormikField (props){
       label={props.label}
       name={props.name}
       autoComplete={props.autoComplete}
-      autoFocus={props.autoFocus}
       //error handeling
       error={meta.touched && meta.error}
       helperText={meta.error}
       
       {...field}
     />
+    </StyleTooltip>
   );
 }
 
@@ -70,19 +70,21 @@ function UserFormikCheckbox(props){
   const [field, meta] = useField({...props, type: 'checkbox'});
     
   return(
-    <FormControlLabel 
-      className={classes.rememberMe}
-      labelPlacement="start"  
-      control={
-        <Checkbox
-          id={name}
-          name={id}
-          color="primary"
-          {...field}
-        />
-      }
-      label={label}
-    />
+      <FormControlLabel 
+        className={classes.rememberMe}
+        labelPlacement="start"  
+        control={
+        <StyleTooltip title={props.note} arrow show={props.showToolTip}>
+          <Checkbox
+            id={name}
+            name={id}
+            color="primary"
+            {...field}
+          />
+        </StyleTooltip>
+        }
+        label={label}
+      />
   );
 }
 
@@ -172,29 +174,23 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={2}/>
-              <HoverPopover
-                noteVariant="body2"
-                note="Enter your Mountain Project account email"
-              >
                 <Grid item xs={6}>
-                  <UserFormikField
-                    id="email"
-                    name="email"
-                    label="Email"
-                    autoComplete="email"
-                    autoFocus={true}
-                  />
+                    <UserFormikField
+                      id="email"
+                      name="email"
+                      label="Email"
+                      autoComplete="email"
+                      showToolTip
+                      note="Enter your Mountain Project email"
+                    />
                 </Grid>
-              </HoverPopover>
               <Grid item xs={2}>
-                <HoverPopover
-                  noteVariant="body2"
-                  note="Get my latitude and longitude"
-                >
+                <StyleTooltip
+                  title="Get my latitude and longitude" show >
                   <IconButton onClick={()=>getLocation()}>
                     <MyLocationIcon/>
                   </IconButton>
-                </HoverPopover>
+                </StyleTooltip>
               </Grid>
               <Grid item xs={2}/>
               {/* <Grid item> */}
@@ -233,16 +229,13 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={6}>
-                <HoverPopover
-                  noteVariant="body2"
+                <UserFormikField
+                  id="distance"
+                  name="distance"
+                  label="Distance (miles)"
+                  showToolTip
                   note="Search radius"
-                >
-                  <UserFormikField
-                    id="distance"
-                    name="distance"
-                    label="Distance (miles)"
-                  />
-                </HoverPopover>
+                />
               </Grid>
               <Grid item xs={6}>
                 <UserFormikField
@@ -261,16 +254,13 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={6} >
-                <HoverPopover
-                  noteVariant="body2"
+                <UserFormikCheckbox
+                  name="rememberMe"
+                  id="rememberMe"
+                  label="Remember Me"
                   note="All data is stored locally on your device"
-                >
-                  <UserFormikCheckbox
-                    name="rememberMe"
-                    id="rememberMe"
-                    label="Remember Me"
-                  />
-                </HoverPopover>
+                  showToolTip
+                />
               </Grid>
               <Grid item xs={6}>
                 <Button

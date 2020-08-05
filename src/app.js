@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 //my stuff
 import RouteTable from './dataTable/index'; 
 import IconTabs from './tabs'; 
-import FormikForm from './form'; 
+import FormikForm from './form/index'; 
 import LoadingSpinner from './loading/spinner'; 
 //CSS dependencies
 

@@ -14,12 +14,14 @@ import { Formik, Form, useField } from 'formik';
 import * as Yup from 'yup';
 //icons
 import MyLocationIcon from '@material-ui/icons/MyLocation';
+import IconButton from '@material-ui/core/IconButton';
 
 const useStyles = makeStyles({
   root:{
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 20
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   note:{
     marginRight : 10,
@@ -27,7 +29,7 @@ const useStyles = makeStyles({
     paddingBottom:0,
   },
   button:{
-    marginTop:12,
+    // margin:,
   },
   rememberMe:{
     marginTop: 5,
@@ -50,11 +52,10 @@ function UserFormikField (props){
       name={props.name}
       autoComplete={props.autoComplete}
       autoFocus={props.autoFocus}
-
       //error handeling
       error={meta.touched && meta.error}
       helperText={meta.error}
-
+      
       {...field}
     />
   );
@@ -68,6 +69,7 @@ function UserFormikCheckbox(props){
   return(
     <FormControlLabel 
       className={classes.rememberMe}
+      labelPlacement="start"  
       control={
         <Checkbox
           id={name}
@@ -87,17 +89,42 @@ export default function FormikForm (props){
   const {
     handleFormSubmit
   } = props;
+  const [latState, setLat] = React.useState('');
+  const [lonState, setLon] = React.useState('');
+
+  //for the get location button
+  const getLocation=()=>{
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(getLocSuccess, getLocError);
+    }
+    else{
+      alert('Geolocation is not supported on your browser.');
+    }
+  }
+
+  const getLocSuccess=(position)=>{
+    console.log(position.coords);
+    setLat(position.coords.latitude);
+    setLon(position.coords.longitude);
+  }
+
+  const getLocError=(error)=>{
+    console.warn(`ERROR(${error.code}): ${error.message}`);
+  }
+
+
   return(
     <Paper className={classes.root}>
       <Formik
+        enableReinitialize={true}
       //will try to load values from local storage, or else just init with null values
       //change these values back to null, just api json for testing
         initialValues={{
           email: localStorage.getItem('email') || apiKey.email, 
           // apiKey: localStorage.getItem('apiKey') || apiKey.key,
           rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,    
-          lat: localStorage.getItem('lat') || apiKey.lat,
-          lon: localStorage.getItem('lon') || apiKey.lon,
+          lat: localStorage.getItem('lat') || latState,//apiKey.lat || ,
+          lon: localStorage.getItem('lon') || lonState,//apiKey.lon,
           distance: localStorage.getItem('distance') || apiKey.distance || 69,
           maxResults: localStorage.getItem('maxResults') || 50,
                     
@@ -129,112 +156,127 @@ export default function FormikForm (props){
       >
       
         <Form autoComplete="on">
-          <Grid container 
-            direction="row" 
-            justify="center" 
-            alignItems="center" 
+          <Grid container
+            direction="column"
+            justify="center"
+            alignItems="center"
             spacing={1}
           >
-            <Grid item>
-              <UserFormikField
-                id="email"
-                name="email"
-                label="Email"
-                autoComplete="email"
-                autoFocus={true}
-              />
+            <Grid container item 
+              direction="row" 
+              justify="center" 
+              alignItems="center" 
+              spacing={2}
+            >
+              <Grid item xs={2}/>
+              <Grid item xs={6}>
+                <UserFormikField
+                  id="email"
+                  name="email"
+                  label="Email"
+                  autoComplete="email"
+                  autoFocus={true}
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <IconButton onClick={()=>getLocation()}>
+                  <MyLocationIcon/>
+                </IconButton>
+              </Grid>
+              <Grid item xs={2}/>
+              {/* <Grid item> */}
+              {/*   <UserFormikField */}
+              {/*     id="apiKey" */}
+              {/*     name="apiKey" */}
+              {/*     label="API Key" */}
+              {/*   /> */}
+              {/* </Grid> */}
             </Grid>
-            {/* <Grid item> */}
-            {/*   <UserFormikField */}
-            {/*     id="apiKey" */}
-            {/*     name="apiKey" */}
-            {/*     label="API Key" */}
-            {/*   /> */}
-            {/* </Grid> */}
-            <Grid item xs >
-              <UserFormikCheckbox
-                name="rememberMe"
-                id="rememberMe"
-                label="Remember Me"
-              />
+            <Grid container item 
+              direction="row" 
+              justify="center" 
+              alignItems="center" 
+              spacing={2}
+            >
+              <Grid item xs={6}>
+                <UserFormikField
+                  id="lat"
+                  name="lat"
+                  label="Latitude"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <UserFormikField
+                  id="lon"
+                  name="lon"
+                  label="Longitude"
+                />
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid container 
-            direction="row" 
-            justify="center" 
-            alignItems="center" 
-            spacing={1}
-          >
-            <Grid item>
-              <UserFormikField
-                id="lat"
-                name="lat"
-                label="Latitude"
-              />
+            <Grid container item 
+              direction="row" 
+              justify="center" 
+              alignItems="center" 
+              spacing={2}
+            >
+              <Grid item xs={6}>
+                <UserFormikField
+                  id="distance"
+                  name="distance"
+                  label="Distance (miles)"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <UserFormikField
+                  id="maxResults"
+                  name="maxResults"
+                  label="Number of Results"
+                />
+              </Grid>
             </Grid>
-            <Grid item>
-              <UserFormikField
-                id="lon"
-                name="lon"
-                label="Longitude"
-              />
-            </Grid>
-          </Grid>
-          <Grid container 
-            direction="row" 
-            justify="center" 
-            alignItems="center" 
-            spacing={1}
-          >
-            <Grid item>
-              <UserFormikField
-                id="distance"
-                name="distance"
-                label="Distance (miles)"
-              />
-            </Grid>
-            <Grid item>
-              <UserFormikField
-                id="maxResults"
-                name="maxResults"
-                label="Number of Results"
-              />
-            </Grid>
-          </Grid>
 
-          <Grid container 
-            direction="row" 
-            justify="center" 
-            alignItems="center" 
-            spacing={1}
-          >
-            <Grid item>
-              <Button
-                className={classes.button}
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Submit
-              </Button>
+            <Grid container item 
+              direction="row" 
+              justify="center" 
+              alignItems="center" 
+              alignContent="center"
+              spacing={2}
+            >
+              <Grid item xs={6} >
+                <UserFormikCheckbox
+                  name="rememberMe"
+                  id="rememberMe"
+                  label="Remember Me"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Button
+                  className={classes.button}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                >
+                  Submit
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         </Form>
       </Formik>
-        <Grid container 
-          direction="row" 
-          justify="flex-end" 
-          alignItems="flex-end" 
-          spacing={1}
-        >
-          <Grid item className={classes.note}>
-            <Typography variant='caption'>
-              <Link href='https://www.mountainproject.com/data' target="_blank">
-                Find my Mountain Project API key
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
+        {/* <Grid container */} 
+        {/*   direction="row" */} 
+        {/*   justify="flex-end" */} 
+        {/*   alignItems="flex-end" */} 
+        {/*   spacing={3} */}
+        {/* > */}
+        {/*   <Grid item className={classes.note}> */}
+        {/*     <Typography variant='caption'> */}
+        {/*       <Link href='https://www.mountainproject.com/data' target="_blank"> */}
+        {/*         Find my Mountain Project API key */}
+        {/*       </Link> */}
+        {/*     </Typography> */}
+        {/*   </Grid> */}
+        {/* </Grid> */}
     </Paper>
 
   );

@@ -95,7 +95,6 @@ export default class UserForm extends React.PureComponent{
     
     this.setState({
       email: values.email,
-      apiKey: values.apiKey,
       rememberMe: values.rememberMe,
       lat: values.lat,
       lon: values.lon,
@@ -482,7 +481,6 @@ export default class UserForm extends React.PureComponent{
       )
       .catch(console.error);
   }
-
 
   render(){
     return(

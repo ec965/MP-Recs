@@ -18,10 +18,12 @@ import ClearIcon from '@material-ui/icons/Clear';
 import StarIcon from '@material-ui/icons/Star';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import ImageIcon from '@material-ui/icons/Image';
 //css
 import { makeStyles, } from '@material-ui/core/styles';
 //my stuff
-import LoadingSpinner from '../loading';
+import LoadingSkeleton from '../loading/skeleton';
+import HoverPopover from '../hoverpopover';
 
 const useStyles=makeStyles({
   locationList:{
@@ -98,26 +100,37 @@ function ButtonLinks(props){
 function DayWeatherInfo(props){
   const { day } = props;
   return(
-    <Grid container 
-      justify="center"
-      alignItems="center"
-      direction="column"
-      spacing={1}
+    <HoverPopover
+      noteVariant="body2"
+      note={day.tempHighNote!=="" 
+        ? 'Day: '+day.tempHighNote : ''
+      }
+      note2={<Typography variant="body2">{'Night: '+day.tempLowNote}</Typography>}
     >
-      <Grid item xs>
-        <img src={day.icon} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',maxWidth:'3em'}}></img>
+      <Grid container 
+        justify="center"
+        alignItems="center"
+        direction="column"
+        spacing={1}
+      >
+        <Grid item xs>
+          <img src={day.icon} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',maxWidth:'3em'}}></img>
+        </Grid>
+        <Grid item xs>
+          <Typography variant='body1'>
+            {day.name}
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Typography variant='body2'>
+            {day.tempHigh!=='' 
+              ? day.tempHigh + ' - ' + day.tempLow + '°F'
+              : day.tempLow + '°F'
+            }
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs>
-        <Typography variant='caption'>
-          {day.name}
-        </Typography>
-      </Grid>
-      <Grid item xs>
-        <Typography variant='caption'>
-          {day.tempHigh + '/' + day.tempLow + 'F'}
-        </Typography>
-      </Grid>
-    </Grid>
+    </HoverPopover>
   );
 }
 
@@ -191,6 +204,7 @@ export default function RouteTableRow (props){
                       };
                     }
                   }
+                  console.log(dispWeather);
                   setWeather(dispWeather);
                 },
                 (error) => {
@@ -208,10 +222,9 @@ export default function RouteTableRow (props){
   }
 
 
-        
   return(
     <React.Fragment>
-      <TableRow hover={true} key={route.id}>
+      <TableRow hover={true} key={route.id} onClick={()=>{setOpen(!open); getWeather();}}>
         <TableCell component="th" scope="row">
           <IconButton size="small" onClick={()=>{setOpen(!open); getWeather();}}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon/>}
@@ -219,7 +232,10 @@ export default function RouteTableRow (props){
         </TableCell>
         <TableCell className={classes.tableCellData} align={align}>
           <Link href={route.imgMedium} target="_blank">
-            <img src={route.imgSqSmall} alt="Unavailable" ></img>
+            {route.imgSqSmall===''
+              ? <ImageIcon fontSize="large"/>
+              : <img src={route.imgSqSmall} alt="Unavailable" ></img>
+            }
           </Link>
         </TableCell>
         <TableCell className={classes.tableCellData} align={align} >
@@ -269,8 +285,10 @@ export default function RouteTableRow (props){
                   <Grid container
                     direciton="row"
                     spacing={3}
+                    justify="center"
+                    alignContent="center"
                   >
-                    {weather[0]===1 && <LoadingSpinner/>}
+                    {weather[0]===1 && <Grid item><LoadingSkeleton/></Grid>}
                     {(weather[0]!==1) && (
                       <React.Fragment>
                         {weather.map(( day, index) => (

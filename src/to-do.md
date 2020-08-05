@@ -1,6 +1,6 @@
 # to-do
-1. popover hover for detailedforecast
-2. find my long/lat - get location javascript thingy as a button on the form page
+3. add button to pre-fill grades
+1. popover hover **fix form
 1. username and email options for query?
 2. setup global theme and style
 5. set currentTab back to 0 after testing
@@ -10,6 +10,7 @@
 3. form verification - using formik
 3. data table sorting
 4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
+2. find my long/lat - get location javascript thingy as a button on the form page
 
 # fetch errors:
 1. get-user

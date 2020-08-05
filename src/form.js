@@ -15,6 +15,9 @@ import * as Yup from 'yup';
 //icons
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import IconButton from '@material-ui/core/IconButton';
+//mystuff
+import HoverPopover from './hoverpopover';
+
 
 const useStyles = makeStyles({
   root:{
@@ -120,12 +123,12 @@ export default function FormikForm (props){
       //will try to load values from local storage, or else just init with null values
       //change these values back to null, just api json for testing
         initialValues={{
-          email: localStorage.getItem('email') || apiKey.email, 
+          email: localStorage.getItem('email') || '',//apiKey.email, 
           // apiKey: localStorage.getItem('apiKey') || apiKey.key,
           rememberMe: (localStorage.getItem('rememberMe') === 'true') || false,    
           lat: localStorage.getItem('lat') || latState,//apiKey.lat || ,
           lon: localStorage.getItem('lon') || lonState,//apiKey.lon,
-          distance: localStorage.getItem('distance') || apiKey.distance || 69,
+          distance: localStorage.getItem('distance') || /*apiKey.distance ||*/ 69,
           maxResults: localStorage.getItem('maxResults') || 50,
                     
         }}
@@ -169,19 +172,29 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={2}/>
-              <Grid item xs={6}>
-                <UserFormikField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  autoComplete="email"
-                  autoFocus={true}
-                />
-              </Grid>
+              <HoverPopover
+                noteVariant="body2"
+                note="Enter your Mountain Project account email"
+              >
+                <Grid item xs={6}>
+                  <UserFormikField
+                    id="email"
+                    name="email"
+                    label="Email"
+                    autoComplete="email"
+                    autoFocus={true}
+                  />
+                </Grid>
+              </HoverPopover>
               <Grid item xs={2}>
-                <IconButton onClick={()=>getLocation()}>
-                  <MyLocationIcon/>
-                </IconButton>
+                <HoverPopover
+                  noteVariant="body2"
+                  note="Get my latitude and longitude"
+                >
+                  <IconButton onClick={()=>getLocation()}>
+                    <MyLocationIcon/>
+                  </IconButton>
+                </HoverPopover>
               </Grid>
               <Grid item xs={2}/>
               {/* <Grid item> */}
@@ -220,11 +233,16 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={6}>
-                <UserFormikField
-                  id="distance"
-                  name="distance"
-                  label="Distance (miles)"
-                />
+                <HoverPopover
+                  noteVariant="body2"
+                  note="Search radius"
+                >
+                  <UserFormikField
+                    id="distance"
+                    name="distance"
+                    label="Distance (miles)"
+                  />
+                </HoverPopover>
               </Grid>
               <Grid item xs={6}>
                 <UserFormikField
@@ -243,11 +261,16 @@ export default function FormikForm (props){
               spacing={2}
             >
               <Grid item xs={6} >
-                <UserFormikCheckbox
-                  name="rememberMe"
-                  id="rememberMe"
-                  label="Remember Me"
-                />
+                <HoverPopover
+                  noteVariant="body2"
+                  note="All data is stored locally on your device"
+                >
+                  <UserFormikCheckbox
+                    name="rememberMe"
+                    id="rememberMe"
+                    label="Remember Me"
+                  />
+                </HoverPopover>
               </Grid>
               <Grid item xs={6}>
                 <Button

@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import RouteTable from './dataTable/index'; 
 import IconTabs from './tabs'; 
 import FormikForm from './form'; 
-import LoadingSpinner from './loading'; 
+import LoadingSpinner from './loading/spinner'; 
 //CSS dependencies
 
 export default class UserForm extends React.PureComponent{

@@ -42,34 +42,7 @@ export default function FormikForm (props){
   const {
     handleFormSubmit
   } = props;
-  const [latState, setLat] = React.useState('');
-  const [lonState, setLon] = React.useState('');
-  const [emailState, setEmail] = React.useState('');
-  const [rememberState, setRemember] = React.useState(false);
-  const [distanceState, setDistance] = React.useState('');
-  const [maxResState, setMaxRes] = React.useState('');
-  const [flashState, setFlash] = React.useState('');
-  const [projState, setProj] = React.useState('');
 
-  //for the get location button
-  const getLocation=()=>{
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(getLocSuccess, getLocError);
-    }
-    else{
-      alert('Geolocation is not supported on your browser.');
-    }
-  }
-
-  const getLocSuccess=(position)=>{
-    console.log(position.coords);
-    setLat(position.coords.latitude);
-    setLon(position.coords.longitude);
-  }
-
-  const getLocError=(error)=>{
-    console.warn(`ERROR(${error.code}): ${error.message}`);
-  }
   
   const huecoGrades = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
   
@@ -80,15 +53,15 @@ export default function FormikForm (props){
       //will try to load values from local storage, or else just init with null values
       //change these values back to null, just api json for testing
         initialValues={{
-          email: localStorage.getItem('email') || emailState,//apiKey.email, 
+          email: localStorage.getItem('email') || '',//apiKey.email, 
           // apiKey: localStorage.getItem('apiKey') || apiKey.key,
-          rememberMe: localStorage.getItem('rememberMe') === 'true' || rememberState,    
-          lat: localStorage.getItem('lat') || latState ,//apiKey.lat || ,
-          lon: localStorage.getItem('lon') || lonState ,//apiKey.lon,
-          distance: localStorage.getItem('distance') || distanceState, /*apiKey.distance ||*/
-          maxResults: localStorage.getItem('maxResults')||maxResState,
-          flashGrade: localStorage.getItem('flashGrade') || flashState,
-          projectGrade: localStorage.getItem('projectGrade') || projState,                    
+          rememberMe: localStorage.getItem('rememberMe') === 'true' || false,    
+          lat: localStorage.getItem('lat') || '' ,//apiKey.lat || ,
+          lon: localStorage.getItem('lon') || '' ,//apiKey.lon,
+          distance: localStorage.getItem('distance') || '' , /*apiKey.distance ||*/
+          maxResults: localStorage.getItem('maxResults')|| '' ,
+          flashGrade: localStorage.getItem('flashGrade') || '' ,
+          projectGrade: localStorage.getItem('projectGrade') || '',                    
         }}
 
         validationSchema={Yup.object({
@@ -159,21 +132,23 @@ export default function FormikForm (props){
                   title="Get my latitude and longitude" show >
                   <IconButton className={classes.locationButton} 
                     onClick={()=>{
-                      setEmail(values.email);
-                      setRemember(values.rememberMe);
-                      setDistance(values.distance);
-                      setMaxRes(values.maxResults);
-                      setFlash(values.flashGrade);
-                      setProj(values.projectGrade);
-                      // console.log(values);
 
-                      // function getLocSuccess(position){
-                      //   console.log(position.coords);
-                      //   setFieldValue('lat', position.coords.latitude);
-                      //   setFieldValue('lon', position.coords.longitude);
-                      // }
-                      // navigator.geolocation.getCurrentPosition(getLocSuccess);
-                      getLocation();
+                      function getLocSuccess(position){
+                        console.log(position.coords);
+                        setFieldValue('lat', position.coords.latitude);
+                        setFieldValue('lon', position.coords.longitude);
+                      }
+
+                      function getLocError (error){
+                        console.warn(`ERROR(${error.code}): ${error.message}`);
+                      }
+                      
+                      if(navigator.geolocation){
+                        navigator.geolocation.getCurrentPosition(getLocSuccess, getLocError);
+                      }
+                      else{
+                        alert('Geolocation is not supported on your browser.')
+                      }
                     }}
                   >
                     <MyLocationIcon/>

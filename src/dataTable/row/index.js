@@ -22,8 +22,8 @@ import ImageIcon from '@material-ui/icons/Image';
 //css
 import { makeStyles, } from '@material-ui/core/styles';
 //my stuff
-import LoadingSkeleton from '../loading/skeleton';
-import HoverPopover from '../hoverpopover';
+import WeatherInfoSkeleton from './skeleton';
+import HoverPopover from './hoverpopover';
 
 const useStyles=makeStyles({
   locationList:{
@@ -114,7 +114,15 @@ function DayWeatherInfo(props){
         spacing={1}
       >
         <Grid item xs>
-          <img src={day.icon} alt='unavailable' style={{borderRadius:'10px',boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',maxWidth:'3em'}}></img>
+          <img 
+            src={day.icon} 
+            alt='unavailable' 
+            style={{
+              borderRadius:'10px',
+              boxShadow:'0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
+              maxWidth:'3em'
+            }}
+          ></img>
         </Grid>
         <Grid item xs>
           <Typography variant='body1'>
@@ -144,6 +152,7 @@ export default function RouteTableRow (props){
   const locationArray = route.location;//.slice(2);
   const starURL = route.url.slice(0,38) + 'stats/' + route.url.slice(38);
 
+  const skeletonArr = [0,1,2,3,4,5,6];
   
   function getWeather(){
     if (weather.length === 0){
@@ -161,7 +170,7 @@ export default function RouteTableRow (props){
                 (data) => {
                   
                   let dispWeather = [];
-                  
+                  let offset=0;
                   //starting on a day time
                   if(data.properties.periods[0].isDaytime){
                     dispWeather[0] = {
@@ -172,19 +181,10 @@ export default function RouteTableRow (props){
                       tempLow: data.properties.periods[1].temperature,
                       tempLowNote: data.properties.periods[1].shortForecast,
                     };
-                    for(let i=2; i<data.properties.periods.length; i+=2){
-                      dispWeather[i/2]={
-                        name: data.properties.periods[i].name.substring(0,3),
-                        tempHigh: data.properties.periods[i].temperature,
-                        tempHighNote: data.properties.periods[i].shortForecast,
-                        icon: data.properties.periods[i].icon,
-                        tempLow: data.properties.periods[i+1].temperature,
-                        tempLowNote: data.properties.periods[i+1].shortForecast,
-                      };
-                    }
                   }
                   //starting on a night time
-                  else{
+                  else {
+                    offset=1;
                     dispWeather[0] = {
                       name: 'Tonight',
                       tempHigh: '',
@@ -193,16 +193,17 @@ export default function RouteTableRow (props){
                       tempLow: data.properties.periods[0].temperature,
                       tempLowNote: data.properties.periods[0].shortForecast,
                     };
-                    for(let i=1; i<data.properties.periods.length-1; i+= 2){
-                      dispWeather[(i+1)/2]={
-                        name: data.properties.periods[i].name.substring(0,3),
-                        tempHigh: data.properties.periods[i].temperature,
-                        tempHighNote: data.properties.periods[i].shortForecast,
-                        icon: data.properties.periods[i].icon,
-                        tempLow: data.properties.periods[i+1].temperature,
-                        tempLowNote: data.properties.periods[i+1].shortForecast,
-                      };
-                    }
+                  }
+
+                  for(let i=(2-offset); i < (data.properties.periods.length-offset) ; i+=2){
+                    dispWeather[(i+offset)/2]={
+                      name: data.properties.periods[i].name.substring(0,3),
+                      tempHigh: data.properties.periods[i].temperature,
+                      tempHighNote: data.properties.periods[i].shortForecast,
+                      icon: data.properties.periods[i].icon,
+                      tempLow: data.properties.periods[i+1].temperature,
+                      tempLowNote: data.properties.periods[i+1].shortForecast,
+                    };
                   }
                   console.log(dispWeather);
                   setWeather(dispWeather);
@@ -233,7 +234,7 @@ export default function RouteTableRow (props){
         <TableCell className={classes.tableCellData} align={align}>
           <Link href={route.imgMedium} target="_blank">
             {route.imgSqSmall===''
-              ? <ImageIcon fontSize="large"/>
+              ? <ImageIcon fontSize="large" color='secondary' style={{width:'100px', height:'100px'}}/>
               : <img src={route.imgSqSmall} alt="Unavailable" ></img>
             }
           </Link>
@@ -288,7 +289,13 @@ export default function RouteTableRow (props){
                     justify="center"
                     alignContent="center"
                   >
-                    {weather[0]===1 && <Grid item><LoadingSkeleton/></Grid>}
+                    {weather[0]===1 && (
+                      <>
+                        {skeletonArr.map((index)=>(
+                          <Grid key={index} item><WeatherInfoSkeleton/></Grid>
+                        ))}
+                      </>
+                    )}
                     {(weather[0]!==1) && (
                       <React.Fragment>
                         {weather.map(( day, index) => (

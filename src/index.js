@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import UserForm from './app'; 
+import App from './app'; 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
@@ -21,17 +21,17 @@ const theme = createMuiTheme({
 
 
 
-class App extends React.Component{
-  render(){
-    return(
+const Root = (props) => {
+  return(
       <React.Fragment>
         <CssBaseline/>
           <ThemeProvider theme={theme}>
-            <UserForm/>
+            <App/>
           </ThemeProvider>
       </React.Fragment>
-    );
-  }
+  );
 }
+  
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+
+ReactDOM.render(<Root/>, document.getElementById('root'));

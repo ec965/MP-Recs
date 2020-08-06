@@ -6,10 +6,10 @@ import Grid from '@material-ui/core/Grid';
 import RouteTable from './dataTable/index'; 
 import IconTabs from './tabs'; 
 import FormikForm from './form/index'; 
-import LoadingSpinner from './loading/spinner'; 
+import LoadingSpinner from './spinner'; 
 //CSS dependencies
 
-export default class UserForm extends React.PureComponent{
+export default class App extends React.PureComponent{
   constructor(props){
     super(props);
     this.state = {
@@ -73,7 +73,8 @@ export default class UserForm extends React.PureComponent{
 
   //Results (dataTable.js) state controlers
   handleChangePage(e, newPage){
-    window.scrollTo(0,0);
+    //disable jumping to the top of the page on new page
+    // window.scrollTo(0,0);
     this.setState({currentPage: newPage});
   }
   

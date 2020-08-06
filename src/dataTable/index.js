@@ -10,9 +10,9 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 //mystuff
 import UserInformation from './userinfo';
-import TablePageControls from './tablepagecontrols';
-import RouteTableRow from './tablerow';
-import RouteTableHead from './tablehead';
+import TablePageControls from './pagecontrols';
+import RouteTableRow from './row/index';
+import RouteTableHead from './head';
 //css
 import { makeStyles, } from '@material-ui/core/styles';
 
@@ -104,7 +104,7 @@ export default function RouteTable(props){
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[5,10,25, {label: 'All', value: -1}]}
+                rowsPerPageOptions={[5,10,25,50, {label: 'All', value: -1}]}
                 count={recList.length}
                 rowsPerPage={rowsPerPage}
                 labelRowsPerPage={'Routes / page'}

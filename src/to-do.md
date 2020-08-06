@@ -1,7 +1,5 @@
 # to-do
 5. accordian for location list
-3. add button to pre-fill grades
-1. popover hover **fix form
 1. username and email options for query?
 2. setup global theme and style
 5. set currentTab back to 0 after testing
@@ -13,6 +11,7 @@
 4. climbing weather integration (https://www.weather.gov/documentation/services-web-api)
 2. find my long/lat - get location javascript thingy as a button on the form page
 6. CSS for tooltip
+3. add button to pre-fill grades - used select
 
 # fetch errors:
 1. get-user

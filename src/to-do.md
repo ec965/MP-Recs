@@ -1,8 +1,5 @@
 # to-do
-2. reject bad emails
-4. stop sign-in form from being pushed up by loading icon
 5. accordian for location list
-1. username and email options for query?
 2. setup global theme and style
 5. set currentTab back to 0 after testing
 
@@ -14,6 +11,8 @@
 2. find my long/lat - get location javascript thingy as a button on the form page
 6. CSS for tooltip
 3. add button to pre-fill grades - used select
+2. reject bad emails
+4. stop sign-in form from being pushed up by loading icon
 
 # fetch errors:
 1. get-user

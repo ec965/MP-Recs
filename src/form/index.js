@@ -23,19 +23,53 @@ const useStyles = makeStyles((theme) => ({
     paddingRight: 20,
     paddingTop: 20,
     paddingBottom: 20,
+    marginTop: '10vh',
   },
-  note:{
-    marginRight : 10,
-    marginBottom: 0,
-    paddingBottom:0,
-  },
-  button:{
-    // margin:,
-  },
+  // note:{
+  //   marginRight : 10,
+  //   marginBottom: 0,
+  //   paddingBottom:0,
+  // },
+  // button:{
+  //   margin:,
+  // },
   locationButton:{
     color: theme.palette.info.main,
   },
 }));
+
+function greaterThan(ref, msg) {
+	return this.test({
+		name: 'greaterThan',
+		exclusive: false,
+    message: msg || '${path} must greater than ${reference}.',
+		params: {
+			reference: ref.path
+		},
+		test: function(value) {
+      return value > this.resolve(ref) 
+		}
+	})
+};
+
+Yup.addMethod(Yup.number, 'greaterThan', greaterThan);
+
+function lessThan(ref, msg) {
+	return this.test({
+		name: 'lessThan',
+		exclusive: false,
+    message: msg || '${path} must less than ${reference}.',
+		params: {
+			reference: ref.path
+		},
+		test: function(value) {
+      return value < this.resolve(ref) 
+		}
+	})
+};
+
+Yup.addMethod(Yup.number, 'lessThan', lessThan);
+
 
 export default function FormikForm (props){
   const classes=useStyles();
@@ -89,11 +123,13 @@ export default function FormikForm (props){
           flashGrade: Yup.number()
             .required('Required')
             .positive()
-            .min(-1,'Hueco grades go from V0-V17'),
+            .min(-1,'Hueco grades go from V0-V17')
+            .lessThan(Yup.ref('projectGrade'), 'Flash grade must be lower than project grade.'),
           projectGrade: Yup.number()
             .required('Required')
             .integer()
-            .max(17, 'Hueco grades go from V0-V17'),
+            .max(17, 'Hueco grades go from V0-V17')
+            .greaterThan(Yup.ref('flashGrade'), 'Project grade must be higher than flash grade.'),
           })}
         onSubmit={handleFormSubmit}
       >

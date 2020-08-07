@@ -2,7 +2,7 @@ import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-// import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 // import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 //Formik
@@ -146,6 +146,7 @@ export default function FormikForm (props){
             alignItems="center"
             spacing={0}
           >
+            <Typography variant="h5">Boulder Field</Typography>
             <Grid container item 
               direction="row" 
               justify="flex-start" 

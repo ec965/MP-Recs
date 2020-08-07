@@ -2,6 +2,7 @@ import React from 'react';
 import apiKey from './apiKey.json';
 //material UI
 import Grid from '@material-ui/core/Grid';
+import Alert from '@material-ui/lab/Alert';
 //my stuff
 import RouteTable from './dataTable/index'; 
 import IconTabs from './tabs'; 
@@ -129,6 +130,23 @@ export default class App extends React.PureComponent{
       (localStorage.getItem('flashGrade')!==this.state.flashGrade.toString())||
       (localStorage.getItem('projectGrade')!==this.state.projectGrade.toString())
     ){
+      this.setState({
+        fetchError: {
+          getUser: null,
+          getTicks: null,
+          getRoutes: null,
+          getRoutesForLatLon: null,
+          getToDos: null,
+          weather: null,
+        },
+        apiError: {
+          getUser: null,
+          getTicks: null,
+          getRoutes: null,
+          getRoutesForLatLon: null,
+          getToDos:null,
+        },
+      });
       this.getName();
       this.getClimbs();
     }
@@ -503,19 +521,25 @@ export default class App extends React.PureComponent{
           tab0={
             <Grid
               container
-              spacing={0}
+              spacing={1}
               direction="column"
               alignItems="center"
               justify="center"
               style={{ minHeight: '60vh' }}
             >
-              <Grid item>
+              <Grid item xs>
                 <FormikForm
                   handleFormSubmit={this.handleFormSubmit}
                 />
               </Grid>
-              <Grid item>
-                {this.state.loading && <LoadingSpinner/>}
+              <Grid item xs>
+                {(this.state.fetchError.getUser || this.state.fetchError.getTicks) && 
+                <Alert severity="error" style={{marginTop: '5px'}}>
+                    This is not a valid Mountain Project email.
+                  </Alert>}
+                {this.state.loading &&
+                  !(this.state.fetchError.getUser || this.state.fetchError.getTicks)
+                  && <LoadingSpinner/>}
               </Grid>
             </Grid>
           }

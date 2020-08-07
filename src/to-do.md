@@ -1,4 +1,6 @@
 # to-do
+2. reject bad emails
+4. stop sign-in form from being pushed up by loading icon
 5. accordian for location list
 1. username and email options for query?
 2. setup global theme and style

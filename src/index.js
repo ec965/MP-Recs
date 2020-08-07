@@ -7,6 +7,9 @@ import blueGrey from '@material-ui/core/colors/blueGrey';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 
 const theme = createMuiTheme({
+  typography:{
+    fontFamily: 'Segoe UI, -apple-system',
+  },
   palette:{
     primary: {
       main: blueGrey[700],
